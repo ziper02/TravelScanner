@@ -53,7 +53,7 @@ def start(update, context):
             reply_markup = InlineKeyboardMarkup(keyboard)
             input.reply_text('Please choose:', reply_markup=reply_markup)
             return FIRST
-    with open(os.path.dirname(__file__) + json_file_flights, 'w',encoding='utf-8') as f:
+    with open(os.path.dirname(__file__)+"/../" + json_file_flights, 'w',encoding='utf-8') as f:
         json.dump(flights, f, ensure_ascii=False, default=SkyScanner.obj_dict, indent=4)
     file_loaded=False
     input.reply_text('Press /start again')
@@ -63,11 +63,11 @@ def start(update, context):
 
 
 def load_next_label_file():
-    with open(os.path.dirname(__file__) + '/../Flights/Data/Whole Month/json_files.json') as f:
+    with open(os.path.dirname(__file__) + '/../Data/Flights/Whole Month/json_files.json') as f:
         json_files = json.load(f)
     for json_file in json_files:
         flights_data = []
-        with open(os.path.dirname(__file__) + json_file) as f:
+        with open(os.path.dirname(__file__)+"/../" + json_file) as f:
             data = json.load(f)
         for temp in data:
             flights_data.append(Flight(**temp))
@@ -112,7 +112,7 @@ def finish_label():
     global flights
     global json_file_flights
     global file_loaded
-    with open(os.path.dirname(__file__) + json_file_flights, 'w', encoding='utf-8') as f:
+    with open(os.path.dirname(__file__)+"/../" + json_file_flights, 'w', encoding='utf-8') as f:
         json.dump(flights, f, ensure_ascii=False, default=SkyScanner.obj_dict, indent=4)
     file_loaded=False
 

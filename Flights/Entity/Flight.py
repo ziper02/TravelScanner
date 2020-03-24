@@ -5,7 +5,8 @@ from Entity.Airport import Airport
 
 class Flight:
 
-    def __init__(self, departure=None, destination=None, depart_date=None, return_date=None, price=None, label=-1,**dict):
+    def __init__(self, departure=None, destination=None, depart_date=None, return_date=None, price=None,
+                 source=None,label=-1,set=-1,**dict):
         if departure!=None:
             self._departure = departure
             self._destination = destination
@@ -13,6 +14,9 @@ class Flight:
             self._return_date = return_date
             self._price = price
             self._label = label
+            self._source = source
+            self._set=set
+
         else:
             self.__dict__.update(dict)
             self._destination=Airport(dict=dict["_destination"])
