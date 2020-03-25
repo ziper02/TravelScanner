@@ -51,7 +51,7 @@ def export_whole_month(depart=None, destination=None, date=None):
                 depart_date = selected_month + '-' + day_depart
                 return_date = selected_month + '-' + day_return
                 flight = Flight(departure=depart, destination=destination, depart_date=depart_date,
-                                return_date=return_date, price=price)
+                                return_date=return_date, price=price,source="SkyScanner")
                 flights.append(flight)
             j = j + 1
         i = i + 1
@@ -74,9 +74,56 @@ def export_whole_month(depart=None, destination=None, date=None):
         append_data.append(json_str)
         with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files.json', 'w',encoding='utf-8') as f:
             json.dump(append_data, f, ensure_ascii=False, default=obj_dict, indent=4)
-
-
+        add_to_json_dict(json_str)
         print('Finished: '+ file_name + ' ' + destination.name + ' ' + selected_month + ".json")
+
+
+def add_to_json_dict(json_file):
+    with open(os.path.dirname(__file__) + '/../Data/Flights/json_files_dict.json', 'r') as f:
+        dict = json.load(f)
+        if "London" in json_file:
+            dict["London"].append(json_file)
+        elif "Prague" in json_file:
+            dict["Prague"].append(json_file)
+        elif "Geneva" in json_file:
+            dict["Geneva"].append(json_file)
+        elif "Schiphol" in json_file:
+            dict["Amsterdam"].append(json_file)
+        elif "Barajas" in json_file:
+            dict["Madrid"].append(json_file)
+        elif "Franz-Josef-Strauss" in json_file:
+            dict["Munich"].append(json_file)
+        elif "Berlin" in json_file:
+            dict["Berlin"].append(json_file)
+        elif "Manchester" in json_file:
+            dict["Manchester"].append(json_file)
+        elif "Ferihegy" in json_file:
+            dict["Budapest"].append(json_file)
+        elif "Zurich" in json_file:
+            dict["Zurich"].append(json_file)
+        elif "Barcelona" in json_file:
+            dict["Barcelona"].append(json_file)
+        elif "Paris" in json_file:
+            dict["Paris"].append(json_file)
+        elif "Bourgas" in json_file:
+            dict["Bourgas"].append(json_file)
+        elif "Topoli" in json_file:
+            dict["Varna"].append(json_file)
+        elif "Milano" in json_file:
+            dict["Milano"].append(json_file)
+        elif "Vrazhdebna" in json_file:
+            dict["Sofia"].append(json_file)
+        elif "Thessaloniki" in json_file:
+            dict["Thessaloniki"].append(json_file)
+        elif "Dublin" in json_file:
+            dict["Dublin"].append(json_file)
+        elif "Lisbon" in json_file:
+            dict["Lisbon"].append(json_file)
+        elif "Belgrade" in json_file:
+            dict["Belgrade"] .append(json_file)
+    with open(os.path.dirname(__file__) + '/../Data/Flights/json_files_dict.json', 'w', encoding='utf-8') as f:
+        json.dump(dict, f, ensure_ascii=False, indent=4)
+
 
 def filter_json_flights():
     with open(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/json_files.json') as f:
