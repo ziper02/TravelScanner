@@ -57,19 +57,23 @@ def export_whole_month(depart=None, destination=None, date=None):
         i = i + 1
     if len(flights) != 0:
         file_name = date.strftime('%Y-%m-%d')
-        with open(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month + '/' +
-                  destination.name + '/' + file_name + ' ' + destination.name + ' ' + selected_month + ".json", 'r',
-                  encoding='utf-8') as f:
-            append_data_flights = json.load(f)
+        my_file = Path(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month + '/' +
+                  destination.name + '/' + file_name + ' ' + destination.name + ' ' + selected_month + ".json")
+        append_data_flights=[]
+        if my_file.is_file():
+            with open(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month + '/' +
+                      destination.name + '/' + file_name + ' ' + destination.name + ' ' + selected_month + ".json", 'r',
+                      encoding='utf-8') as f:
+                append_data_flights = json.load(f)
         flights=flights+append_data_flights
         with open(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month + '/' +
                   destination.name + '/' + file_name + ' ' + destination.name + ' ' + selected_month + ".json", 'w',
                   encoding='utf-8') as f:
             json.dump(flights, f, ensure_ascii=False, default=obj_dict, indent=4)
 
-        with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files.json', 'r',encoding='utf-8') as f:
+        with open(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/json_files.json', 'r',encoding='utf-8') as f:
             append_data=json.load(f)
-        json_str = '/../Flights/Data/Whole Month/' + selected_month + '/' + \
+        json_str = '/Flights/Data/Whole Month/' + selected_month + '/' + \
                    destination.name + '/' + file_name + ' ' + destination.name + ' ' + selected_month + '.json'
         append_data.append(json_str)
         with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files.json', 'w',encoding='utf-8') as f:
