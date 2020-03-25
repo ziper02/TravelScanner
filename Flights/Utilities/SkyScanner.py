@@ -79,7 +79,7 @@ def export_whole_month(depart=None, destination=None, date=None):
 
 
 def add_to_json_dict(json_file):
-    with open(os.path.dirname(__file__) + '/../Data/Flights/json_files_dict.json', 'r') as f:
+    with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files_dict.json', 'r') as f:
         dict = json.load(f)
         if "London" in json_file:
             dict["London"].append(json_file)
@@ -121,7 +121,7 @@ def add_to_json_dict(json_file):
             dict["Lisbon"].append(json_file)
         elif "Belgrade" in json_file:
             dict["Belgrade"] .append(json_file)
-    with open(os.path.dirname(__file__) + '/../Data/Flights/json_files_dict.json', 'w', encoding='utf-8') as f:
+    with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files_dict.json', 'w', encoding='utf-8') as f:
         json.dump(dict, f, ensure_ascii=False, indent=4)
 
 
