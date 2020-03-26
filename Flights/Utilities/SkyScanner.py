@@ -9,6 +9,7 @@ import Moderator
 from DataManager import data_manager
 from Entity.Airport import Airport
 from Entity.Flight import Flight
+from collections import defaultdict
 
 whole_month_url = data_manager.SkyScanner_whole_month_request
 
@@ -56,7 +57,7 @@ def export_whole_month(depart=None, destination=None, date=None):
             j = j + 1
         i = i + 1
     if len(flights) != 0:
-        file_name = date.strftime('%Y-%m-%d')
+        file_name = datetime.today().strftime('%Y-%m-%d')
         my_file = Path(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month + '/' +
                   destination.name + '/' + file_name + ' ' + destination.name + ' ' + selected_month + ".json")
         append_data_flights=[]
@@ -71,9 +72,9 @@ def export_whole_month(depart=None, destination=None, date=None):
                   encoding='utf-8') as f:
             json.dump(flights, f, ensure_ascii=False, default=obj_dict, indent=4)
 
-        with open(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/json_files.json', 'r',encoding='utf-8') as f:
+        with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files.json', 'r',encoding='utf-8') as f:
             append_data=json.load(f)
-        json_str = '/Flights/Data/Whole Month/' + selected_month + '/' + \
+        json_str = '/Data/Flights/Whole Month/' + selected_month + '/' + \
                    destination.name + '/' + file_name + ' ' + destination.name + ' ' + selected_month + '.json'
         append_data.append(json_str)
         with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files.json', 'w',encoding='utf-8') as f:
@@ -85,46 +86,128 @@ def export_whole_month(depart=None, destination=None, date=None):
 def add_to_json_dict(json_file):
     with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files_dict.json', 'r') as f:
         dict = json.load(f)
+        if len(dict)==0:
+            dict=defaultdict(list)
         if "London" in json_file:
-            dict["London"].append(json_file)
+            if 'London' in dict.keys():
+                dict["London"].append(json_file)
+            else:
+                dict["London"]=[]
+                dict["London"].append(json_file)
         elif "Prague" in json_file:
-            dict["Prague"].append(json_file)
+            if 'Prague' in dict.keys():
+                dict["Prague"].append(json_file)
+            else:
+                dict["Prague"]=[]
+                dict["Prague"].append(json_file)
         elif "Geneva" in json_file:
-            dict["Geneva"].append(json_file)
+            if 'Geneva' in dict.keys():
+                dict["Geneva"].append(json_file)
+            else:
+                dict["Geneva"]=[]
+                dict["Geneva"].append(json_file)
         elif "Schiphol" in json_file:
-            dict["Amsterdam"].append(json_file)
+            if 'Amsterdam' in dict.keys():
+                dict["Amsterdam"].append(json_file)
+            else:
+                dict["Amsterdam"]=[]
+                dict["Amsterdam"].append(json_file)
         elif "Barajas" in json_file:
-            dict["Madrid"].append(json_file)
+            if 'Madrid' in dict.keys():
+                dict["Madrid"].append(json_file)
+            else:
+                dict["Madrid"]=[]
+                dict["Madrid"].append(json_file)
         elif "Franz-Josef-Strauss" in json_file:
-            dict["Munich"].append(json_file)
+            if 'Munich' in dict.keys():
+                dict["Munich"].append(json_file)
+            else:
+                dict["Munich"]=[]
+                dict["Munich"].append(json_file)
         elif "Berlin" in json_file:
-            dict["Berlin"].append(json_file)
+            if 'Berlin' in dict.keys():
+                dict["Berlin"].append(json_file)
+            else:
+                dict["Berlin"]=[]
+                dict["Berlin"].append(json_file)
         elif "Manchester" in json_file:
-            dict["Manchester"].append(json_file)
+            if 'Manchester' in dict.keys():
+                dict["Manchester"].append(json_file)
+            else:
+                dict["Manchester"]=[]
+                dict["Manchester"].append(json_file)
         elif "Ferihegy" in json_file:
-            dict["Budapest"].append(json_file)
+            if 'Budapest' in dict.keys():
+                dict["Budapest"].append(json_file)
+            else:
+                dict["Budapest"]=[]
+                dict["Budapest"].append(json_file)
         elif "Zurich" in json_file:
-            dict["Zurich"].append(json_file)
+            if 'Zurich' in dict.keys():
+                dict["Zurich"].append(json_file)
+            else:
+                dict["Zurich"]=[]
+                dict["Zurich"].append(json_file)
         elif "Barcelona" in json_file:
-            dict["Barcelona"].append(json_file)
+            if 'Barcelona' in dict.keys():
+                dict["Barcelona"].append(json_file)
+            else:
+                dict["Barcelona"]=[]
+                dict["Barcelona"].append(json_file)
         elif "Paris" in json_file:
-            dict["Paris"].append(json_file)
+            if 'Paris' in dict.keys():
+                dict["Paris"].append(json_file)
+            else:
+                dict["Paris"]=[]
+                dict["Paris"].append(json_file)
         elif "Bourgas" in json_file:
-            dict["Bourgas"].append(json_file)
+            if 'Bourgas' in dict.keys():
+                dict["Bourgas"].append(json_file)
+            else:
+                dict["Bourgas"]=[]
+                dict["Bourgas"].append(json_file)
         elif "Topoli" in json_file:
-            dict["Varna"].append(json_file)
+            if 'Varna' in dict.keys():
+                dict["Varna"].append(json_file)
+            else:
+                dict["Varna"]=[]
+                dict["Varna"].append(json_file)
         elif "Milano" in json_file:
-            dict["Milano"].append(json_file)
+            if 'Milano' in dict.keys():
+                dict["Milano"].append(json_file)
+            else:
+                dict["Milano"]=[]
+                dict["Milano"].append(json_file)
         elif "Vrazhdebna" in json_file:
-            dict["Sofia"].append(json_file)
+            if 'Sofia' in dict.keys():
+                dict["Sofia"].append(json_file)
+            else:
+                dict["Sofia"]=[]
+                dict["Sofia"].append(json_file)
         elif "Thessaloniki" in json_file:
-            dict["Thessaloniki"].append(json_file)
+            if 'Thessaloniki' in dict.keys():
+                dict["Thessaloniki"].append(json_file)
+            else:
+                dict["Thessaloniki"]=[]
+                dict["Thessaloniki"].append(json_file)
         elif "Dublin" in json_file:
-            dict["Dublin"].append(json_file)
+            if 'Dublin' in dict.keys():
+                dict["Dublin"].append(json_file)
+            else:
+                dict["Dublin"]=[]
+                dict["Dublin"].append(json_file)
         elif "Lisbon" in json_file:
-            dict["Lisbon"].append(json_file)
+            if 'Lisbon' in dict.keys():
+                dict["Lisbon"].append(json_file)
+            else:
+                dict["Lisbon"]=[]
+                dict["Lisbon"].append(json_file)
         elif "Belgrade" in json_file:
-            dict["Belgrade"] .append(json_file)
+            if 'Belgrade' in dict.keys():
+                dict["Belgrade"].append(json_file)
+            else:
+                dict["Belgrade"]=[]
+                dict["Belgrade"].append(json_file)
     with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files_dict.json', 'w', encoding='utf-8') as f:
         json.dump(dict, f, ensure_ascii=False, indent=4)
 

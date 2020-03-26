@@ -63,7 +63,7 @@ def start(update, context):
 
 
 def load_next_label_file():
-    with open(os.path.dirname(__file__) + '/../Data/Flights/Whole Month/json_files.json') as f:
+    with open(os.path.dirname(__file__) + '/../Data/Flights/json_files.json') as f:
         json_files = json.load(f)
     for json_file in json_files:
         flights_data = []
