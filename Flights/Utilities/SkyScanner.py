@@ -18,7 +18,7 @@ def export_whole_month_all_dest():
     date_selected = datetime.today()
     dates = []
     depart_list=[Airport(code=o) for o in Moderator.depart_list]
-    destination_list=[Airport(code=o) for o in Moderator.destination_list]
+    destination_list=[Airport(code=o) for o in Moderator.destination_list_skyscanner]
     for i in range(11):
         dates.append(date_selected)
         date_selected = date_selected + relativedelta(months=1)
@@ -31,8 +31,8 @@ def export_whole_month_all_dest():
 
 def export_whole_month(depart=None, destination=None, date=None):
     selected_month = date.strftime('%Y-%m')
-    Path(os.path.dirname(__file__) + '/../Data/Whole Month/' + selected_month).mkdir(parents=True, exist_ok=True)
-    Path(os.path.dirname(__file__) + '/../Data/Whole Month/' + selected_month + '/' + destination.name).mkdir(
+    Path(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month).mkdir(parents=True, exist_ok=True)
+    Path(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month + '/' + destination.name).mkdir(
         parents=True, exist_ok=True)
     request_whole_month_url = whole_month_url.format(depart=depart.code, destination=destination.code,
                                                      selected_month=selected_month)
