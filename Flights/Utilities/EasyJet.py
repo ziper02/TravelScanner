@@ -4,7 +4,7 @@ from pathlib import Path
 
 import requests
 from dateutil.relativedelta import relativedelta
-from forex_python.converter import CurrencyRates
+
 
 import Moderator
 from DataManager import data_manager
@@ -28,8 +28,10 @@ locations = ('Amsterdam', 'London Stansted', 'Berlin Schoenefeld', 'Berlin Tegal
              'London Luton', 'Lyon', 'Manchester', 'Milan Malpensa', 'Paris Charles de Gaulle (CDG)')
 
 whole_month_url = data_manager.Easyjet_whole_month_request
-c = CurrencyRates()
-exchange_rate=c.get_rate('EUR', 'ILS')
+
+currency_url = data_manager.currency_conversion.format(src='EUR',dest='ILS')
+request_currency = requests.get(url=currency_url)
+exchange_rate=request_currency.json()['EUR_ILS']
 
 def export_whole_months_all_dest():
     depart_list=[Airport(code=o) for o in Moderator.depart_list]
