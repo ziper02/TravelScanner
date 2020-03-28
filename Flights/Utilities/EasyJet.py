@@ -4,6 +4,7 @@ from pathlib import Path
 
 import requests
 from dateutil.relativedelta import relativedelta
+from forex_python.converter import CurrencyRates
 
 import Moderator
 from DataManager import data_manager
@@ -27,7 +28,8 @@ locations = ('Amsterdam', 'London Stansted', 'Berlin Schoenefeld', 'Berlin Tegal
              'London Luton', 'Lyon', 'Manchester', 'Milan Malpensa', 'Paris Charles de Gaulle (CDG)')
 
 whole_month_url = data_manager.Easyjet_whole_month_request
-
+c = CurrencyRates()
+exchange_rate=c.get_rate('EUR', 'ILS')
 
 def export_whole_months_all_dest():
     depart_list=[Airport(code=o) for o in Moderator.depart_list]
@@ -59,27 +61,28 @@ def export_whole_months(depart=None, destination=None):
     for month in data_depart:
         year_month_date_depart = str(month["year"]) + '-' + month_string_to_number(month["monthDisplayName"])
         days = month['days']
-        i = 0
+        dayIndex = 0
         for day in days:
             if not day['lowestFare'] is None:
                 price_depart=day['lowestFare']
-                day_depart = ("0" if (i + 1) < 10 else "") + str(i + 1)
+                day_depart = ("0" if (dayIndex + 1) < 10 else "") + str(dayIndex + 1)
                 selected_date_depart_str = year_month_date_depart + '-' + day_depart
                 potential_days_return_list = []
                 selected_date_depart_datetime = datetime.strptime(selected_date_depart_str, '%Y-%m-%d')
                 for j in range(3, 7):
                     potential_days_return_list.append(selected_date_depart_datetime + relativedelta(days=j))
                 for potential_day_return in potential_days_return_list:
-                    day_return_str = potential_day_return.strftime("%d")
+                    day_return_str = str(int(potential_day_return.strftime("%d"))-1)
                     month_return_str = str(int(potential_day_return.strftime("%m"))- int(month_string_to_number(data_return[0]["monthDisplayName"])))
                     selected_date_return_str = datetime.strftime(potential_day_return, '%Y-%m-%d')
                     if potential_day_return<return_max_date_datetime:
                         if not data_return[int(month_return_str)]['days'][int(day_return_str)]['lowestFare'] is None:
                             price_return=data_return[int(month_return_str)]['days'][int(day_return_str)]['lowestFare']
-                            total_price=price_depart+price_return
+                            total_price=exchange_rate*(price_depart+price_return)
                             flight=Flight(departure=depart,destination=destination,depart_date=selected_date_depart_str,
                                           return_date=selected_date_return_str,price=total_price,source='Easyjet')
                             flights.append(flight)
+            dayIndex = dayIndex + 1
         if len(flights) != 0:
             file_name = datetime.today().strftime('%Y-%m-%d')
             dest_all_for_name=Airport(Moderator.transfer_airport_cod_names_to_all(destination.code))
@@ -115,7 +118,8 @@ def export_whole_months(depart=None, destination=None):
             SkyScanner.add_to_json_dict(json_str)
             print('Finished: ' + file_name + ' ' + dest_all_for_name.name + ' ' + year_month_date_depart + ".json")
         flights = []
-        i = i + 1
+
+
 
 def create_dict_for_location(st='all'):
     '''

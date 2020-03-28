@@ -1,10 +1,6 @@
 import platform
 from enum import Enum
 
-import requests
-
-import DataManager
-
 if platform.system() == 'Windows':
     add_for_folders = ''
 else:
@@ -61,19 +57,3 @@ class set(Enum):
     train = 1
     validation = 2
     test = 3
-
-
-def RealTimeCurrencyExchangeRate(from_currency, to_currency):
-    base_url = r"https://www.alphavantage.co/query?function = CURRENCY_EXCHANGE_RATE"
-    api_key=DataManager.data_manager.currency_exchange_api_key
-    main_url = base_url + "&from_currency =" + from_currency + "&to_currency =" + to_currency + "&apikey =" + api_key
-    req_ob = requests.get(main_url)
-    result = req_ob.json()
-    print("\n After parsing : \n Realtime Currency Exchange Rate for",
-          result["Realtime Currency Exchange Rate"]
-          ["2. From_Currency Name"], "TO",
-          result["Realtime Currency Exchange Rate"]
-          ["4. To_Currency Name"], "is",
-          result["Realtime Currency Exchange Rate"]
-          ['5. Exchange Rate'], to_currency)
-

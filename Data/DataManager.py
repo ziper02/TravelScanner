@@ -9,5 +9,4 @@ class data_manager:
     TravelScanner_bot = _data["TravelScanner bot"]
     SkyScanner_whole_month_request=_data["SkyScanner whole month request"]
     Easyjet_whole_month_request=_data["Easyjet_whole_month_request"]
-    currency_exchange_api_key=_data["real time currency exchange rate api key"]
 
