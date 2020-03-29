@@ -73,6 +73,16 @@ class Flight:
     def return_date(self):
         return self._return_date
 
+
+    @return_date.setter
+    def return_date(self, value):
+        self._return_date = value
+
+
+    @depart_date.setter
+    def depart_date(self, value):
+        self._depart_date = value
+
     @property
     def price(self):
         return self._price

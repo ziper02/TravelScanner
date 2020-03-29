@@ -4,7 +4,7 @@ from pathlib import Path
 
 import requests
 from dateutil.relativedelta import relativedelta
-
+from tqdm import tqdm
 
 import Moderator
 from DataManager import data_manager
@@ -22,7 +22,7 @@ from selenium.webdriver.common.by import By
 from TelegramBot import bot
 import sys
 
-from Utilities import SkyScanner
+from Utilities import SkyScanner, General
 
 locations = ('Amsterdam', 'London Stansted', 'Berlin Schoenefeld', 'Berlin Tegal', 'Geneva', 'London Gatwick',
              'London Luton', 'Lyon', 'Manchester', 'Milan Malpensa', 'Paris Charles de Gaulle (CDG)')
@@ -37,7 +37,10 @@ def export_whole_months_all_dest():
     depart_list=[Airport(code=o) for o in Moderator.depart_list]
     destination_list=[Airport(code=o) for o in Moderator.destination_list_easyjet]
     for depart in depart_list:
-        for destination in destination_list:
+        t_progress_bar_destination = tqdm(destination_list, leave=True)
+        for destination in t_progress_bar_destination:
+            t_progress_bar_destination.set_description("EasyJet " + destination.name)
+            t_progress_bar_destination.refresh()
             export_whole_months(depart=depart, destination=destination)
             time.sleep(0.6)
 
@@ -85,40 +88,7 @@ def export_whole_months(depart=None, destination=None):
                                           return_date=selected_date_return_str,price=total_price,source='Easyjet')
                             flights.append(flight)
             dayIndex = dayIndex + 1
-        if len(flights) != 0:
-            file_name = datetime.today().strftime('%Y-%m-%d')
-            dest_all_for_name=Airport(Moderator.transfer_airport_cod_names_to_all(destination.code))
-            Path(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + year_month_date_depart).mkdir(parents=True,
-                                                                                             exist_ok=True)
-            Path(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + year_month_date_depart + '/' + dest_all_for_name.name).mkdir(
-                parents=True, exist_ok=True)
-            my_file = Path(
-                os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + year_month_date_depart + '/' +
-                dest_all_for_name.name + '/' + file_name + ' ' + dest_all_for_name.name + ' ' + year_month_date_depart + ".json")
-            append_data_flights = []
-            if my_file.is_file():
-                with open(
-                        os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + year_month_date_depart + '/' +
-                        dest_all_for_name.name + '/' + file_name + ' ' + dest_all_for_name.name + ' ' + year_month_date_depart + ".json",
-                        'r',
-                        encoding='utf-8') as f:
-                    append_data_flights = json.load(f)
-            flights = flights + append_data_flights
-            with open(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + year_month_date_depart + '/' +
-                      dest_all_for_name.name + '/' + file_name + ' ' + dest_all_for_name.name + ' ' + year_month_date_depart + ".json",
-                      'w',
-                      encoding='utf-8') as f:
-                json.dump(flights, f, ensure_ascii=False, default=SkyScanner.obj_dict, indent=4)
-
-            with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files.json', 'r', encoding='utf-8') as f:
-                append_data = json.load(f)
-            json_str = '/Data/Flights/Whole Month/' + year_month_date_depart + '/' + \
-                       dest_all_for_name.name + '/' + file_name + ' ' + dest_all_for_name.name + ' ' + year_month_date_depart + '.json'
-            append_data.append(json_str)
-            with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files.json', 'w', encoding='utf-8') as f:
-                json.dump(append_data, f, ensure_ascii=False, default=SkyScanner.obj_dict, indent=4)
-            SkyScanner.add_to_json_dict(json_str)
-            print('Finished: ' + file_name + ' ' + dest_all_for_name.name + ' ' + year_month_date_depart + ".json")
+        General.update_json_files(flights=flights,year_month_date_depart=year_month_date_depart,destination=destination)
         flights = []
 
 

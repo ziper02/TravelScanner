@@ -11,6 +11,7 @@ destination_list_skyscanner = ["LOND", "PRAG", "BERL", "MUC", "ZRH", "BCN", "MAD
 
 destination_list_easyjet = ["AMS", "BSL", "SXF", "TXL", "BOD", "GVA", "LTN", "LYS", "MAN",
                     "MXP", "NTE", "NAP", "NCE", "CDG", "TLS", "VCE"]
+destination_list_wizzair = ["VAR","SOF","VIE","BUD","DEB","RIX","VNO","KTW","KRK","WAW","OTP","CLJ","IAS","SBZ","TSR","LTN"]
 depart_list = ["TLV"]
 
 
@@ -25,7 +26,6 @@ def transfer_airport_cod_names_to_all(short_name):
         return m[short_name]
     else:
         return short_name
-
 
 
 
