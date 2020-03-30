@@ -5,6 +5,23 @@ import matplotlib.pyplot as plt
 from Entity.Flight import Flight
 
 
+
+def get_how_much_flights_per_airport():
+    with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files_dict.json', 'r') as f:
+        dict = json.load(f)
+
+    count = 0
+    for key in dict:
+        countList = 0
+        for item in dict[key]:
+            with open(os.path.dirname(__file__) + "/../../" + item, 'r') as f:
+                list = json.load(f)
+            countList = countList + len(list)
+        print(key + " have " + str(countList))
+        count = count + countList
+    print("total have " + str(count))
+
+
 def get_statistic_of_destination(name):
     with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files_dict.json', 'r') as f:
         dict = json.load(f)

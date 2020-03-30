@@ -75,7 +75,7 @@ def add_to_json_dict(json_file):
                 bool=False
         if bool:
             for dest in Moderator.destination_list_skyscanner:
-                name=Airport(dest).country.name
+                name=Airport(Moderator.transfer_airport_cod_names_to_all(Airport(dest).code)).name
                 if name in json_file:
                     if name in dict:
                         dict[name].append(json_file)
@@ -87,7 +87,7 @@ def add_to_json_dict(json_file):
                     bool = False
         if bool:
             for dest in Moderator.destination_list_wizzair:
-                name=Airport(dest).country.name
+                name=Airport(Moderator.transfer_airport_cod_names_to_all(Airport(dest).code)).name
                 if name in json_file:
                     if name in dict:
                         dict[name].append(json_file)
@@ -96,6 +96,7 @@ def add_to_json_dict(json_file):
                         dict[name] = []
                         dict[name].append(json_file)
                         dict[name] = list(set(dict[name]))
+
     with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files_dict.json', 'w', encoding='utf-8') as f:
         json.dump(dict, f, ensure_ascii=False, indent=4)
 

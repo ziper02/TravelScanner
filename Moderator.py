@@ -7,7 +7,7 @@ else:
     add_for_folders = '/home/ubuntu/TravelScanner/'
 
 destination_list_skyscanner = ["LOND", "PRAG", "BERL", "MUC", "ZRH", "BCN", "MAD", "AMS", "MAN",
-                    "BUD", "GVA", "PARI", "BOJ", "VAR", "MILA", "SOF", "SKG", "DUB", "LIS", "BELI"]
+                    "BUD", "GVA", "PARI", "BOJ", "VAR", "MILA", "SOF", "SKG", "DUB", "LIS", "BELI","MLA"]
 
 destination_list_easyjet = ["AMS", "BSL", "SXF", "TXL", "BOD", "GVA", "LTN", "LYS", "MAN",
                     "MXP", "NTE", "NAP", "NCE", "CDG", "TLS", "VCE"]
