@@ -55,7 +55,7 @@ class Flight:
     def __str__(self):
         return "Flight:: departure:  " + str(self._departure) + "\ndestination:  " + str(self._destination) + \
                "\ndepart date:  " + str(self._depart_date) + " return date:  " + str(self._return_date) + \
-               "\nprice:  " + str(self._price)
+               "\nprice:  " + str(self._price) + " label:  " + str(self._label)
 
     @property
     def departure(self):

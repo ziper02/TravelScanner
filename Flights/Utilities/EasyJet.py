@@ -1,25 +1,25 @@
+import json
+import os
+import sys
 import time
 from datetime import datetime
+
 import requests
 from dateutil.relativedelta import relativedelta
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 from tqdm import tqdm
+
 import Moderator
 from DataManager import data_manager
 from Entity.Airport import Airport
 from Entity.Flight import Flight
 from Moderator import month_string_to_number
 from MyScanner import Scanner as sc
-import os
-import json
-
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.by import By
 from TelegramBot import bot
-import sys
-
-from Utilities import SkyScanner, General
+from Utilities import General
 
 locations = ('Amsterdam', 'London Stansted', 'Berlin Schoenefeld', 'Berlin Tegal', 'Geneva', 'London Gatwick',
              'London Luton', 'Lyon', 'Manchester', 'Milan Malpensa', 'Paris Charles de Gaulle (CDG)')
@@ -28,7 +28,7 @@ whole_month_url = data_manager.Easyjet_whole_month_request
 
 currency_url = data_manager.currency_conversion.format(src='EUR', dest='ILS')
 request_currency = requests.get(url=currency_url)
-exchange_rate =request_currency.json()['EUR_ILS']
+exchange_rate = request_currency.json()['EUR_ILS']
 
 
 def export_whole_months_all_dest():
@@ -58,9 +58,12 @@ def export_whole_months(depart=None, destination=None):
     data_return_hash = request.json()
     data_depart = data_depart_hash["months"]
     data_return = data_return_hash["months"]
-    year_month_day_date_return_str = str(data_return[len(data_return) - 1]["year"]) + '-' + month_string_to_number(
-        data_return[len(data_return) - 1]["monthDisplayName"]) + '-' \
-                                     + str(len(data_return[len(data_return) - 1]['days']))
+    try:
+        year_month_day_date_return_str = str(data_return[len(data_return) - 1]["year"]) + '-' + month_string_to_number(
+            data_return[len(data_return) - 1]["monthDisplayName"]) + '-' \
+                                        + str(len(data_return[len(data_return) - 1]['days']))
+    except:
+        return
     return_max_date_datetime = datetime.strptime(year_month_day_date_return_str, '%Y-%m-%d')
     flights = []
     for month in data_depart:
@@ -96,10 +99,10 @@ def export_whole_months(depart=None, destination=None):
 
 
 def create_dict_for_location(st='all'):
-    '''
+    """
     :param st:if need to get all the locations
     :return: dict that the key is location-month-year
-    '''
+    """
     months = (
         'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November',
         'December')
@@ -118,11 +121,11 @@ def create_dict_for_location(st='all'):
 
 
 def update_locations_new_notfication_file():
-    '''
+    """
     :return:
         update the notifications flights according to available flights in easyjet
         if the file is not exist, the function create one
-    '''
+    """
     if not os.path.isfile('Flights/EasyJet/notifications.json'):
         mydict = create_dict_for_location('all')
         mydict = json.dumps(mydict, indent=4)
