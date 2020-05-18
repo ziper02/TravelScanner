@@ -7,10 +7,9 @@ from pathlib import Path
 import Moderator
 from Entity.Airport import Airport
 from Entity.Flight import Flight
-from Utilities import SkyScanner
 
 
-def update_json_files(flights,year_month_date_depart,destination):
+def update_json_files(flights, year_month_date_depart, destination):
     if len(flights) != 0:
         file_name = datetime.today().strftime('%Y-%m-%d')
         dest_all_for_name = Airport(Moderator.transfer_airport_cod_names_to_all(destination.code))
@@ -46,11 +45,12 @@ def update_json_files(flights,year_month_date_depart,destination):
         json_str = '/Data/Flights/Whole Month/' + year_month_date_depart + '/' + \
                    dest_all_for_name.name + '/' + file_name + ' ' + dest_all_for_name.name + ' ' + year_month_date_depart + '.json'
         append_data.append(json_str)
-        append_data=list(set(append_data))
+        append_data = list(set(append_data))
         with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files.json', 'w',
                   encoding='utf-8') as f:
             json.dump(append_data, f, ensure_ascii=False, default=obj_dict, indent=4)
         add_to_json_dict(json_str)
+
 
 def obj_dict(obj):
     return obj.__dict__
@@ -59,11 +59,11 @@ def obj_dict(obj):
 def add_to_json_dict(json_file):
     with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files_dict.json', 'r') as f:
         dict = json.load(f)
-        if len(dict)==0:
-            dict=defaultdict(list)
-        bool=True
+        if len(dict) == 0:
+            dict = defaultdict(list)
+        bool = True
         for dest in Moderator.destination_list_easyjet:
-            name=Airport(Moderator.transfer_airport_cod_names_to_all(Airport(dest).code)).name
+            name = Airport(Moderator.transfer_airport_cod_names_to_all(Airport(dest).code)).name
             if name in json_file:
                 if name in dict:
                     dict[name].append(json_file)
@@ -71,11 +71,11 @@ def add_to_json_dict(json_file):
                 else:
                     dict[name] = []
                     dict[name].append(json_file)
-                    dict[name]=list(set(dict[name]))
-                bool=False
+                    dict[name] = list(set(dict[name]))
+                bool = False
         if bool:
             for dest in Moderator.destination_list_skyscanner:
-                name=Airport(Moderator.transfer_airport_cod_names_to_all(Airport(dest).code)).name
+                name = Airport(Moderator.transfer_airport_cod_names_to_all(Airport(dest).code)).name
                 if name in json_file:
                     if name in dict:
                         dict[name].append(json_file)
@@ -87,7 +87,7 @@ def add_to_json_dict(json_file):
                     bool = False
         if bool:
             for dest in Moderator.destination_list_wizzair:
-                name=Airport(Moderator.transfer_airport_cod_names_to_all(Airport(dest).code)).name
+                name = Airport(Moderator.transfer_airport_cod_names_to_all(Airport(dest).code)).name
                 if name in json_file:
                     if name in dict:
                         dict[name].append(json_file)
@@ -106,11 +106,10 @@ def filter_json_flights():
         json_files = json.load(f)
     for json_file in json_files:
         flights_data = []
-        with open(os.path.dirname(__file__)+ json_file) as f:
+        with open(os.path.dirname(__file__) + json_file) as f:
             data = json.load(f)
         for temp in data:
             flights_data.append(Flight(**temp))
         Flight.filter_list_of_flights(flights_data)
-        with open(os.path.dirname(__file__) +json_file,'w',encoding='utf-8') as f:
+        with open(os.path.dirname(__file__) + json_file, 'w', encoding='utf-8') as f:
             json.dump(flights_data, f, ensure_ascii=False, default=obj_dict, indent=4)
-
