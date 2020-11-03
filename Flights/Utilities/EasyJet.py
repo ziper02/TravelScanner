@@ -3,6 +3,7 @@ import os
 import sys
 import time
 from datetime import datetime
+from Data import DataManager as dm
 
 import requests
 from dateutil.relativedelta import relativedelta
@@ -80,13 +81,19 @@ def export_whole_months(depart=None, destination=None):
                 for j in range(3, 7):
                     potential_days_return_list.append(selected_date_depart_datetime + relativedelta(days=j))
                 for potential_day_return in potential_days_return_list:
-                    day_return_str = str(int(potential_day_return.strftime("%d")) - 1)
-                    month_return_str = str(int(potential_day_return.strftime("%m")) - int(
-                        month_string_to_number(data_return[0]["monthDisplayName"])))
+                    day_return = int(potential_day_return.strftime("%d")) - 1
+
+                    month_return_str = dm.data_manager.month_dict[potential_day_return.strftime("%m")]
+                    month_return=0
+                    for return_temp in data_return:
+                        if return_temp['monthDisplayName']==month_return_str:
+                            break
+                        month_return=month_return+1
+
                     selected_date_return_str = datetime.strftime(potential_day_return, '%Y-%m-%d')
                     if potential_day_return < return_max_date_datetime:
-                        if not data_return[int(month_return_str)]['days'][int(day_return_str)]['lowestFare'] is None:
-                            price_return = data_return[int(month_return_str)]['days'][int(day_return_str)]['lowestFare']
+                        if not data_return[month_return]['days'][day_return]['lowestFare'] is None:
+                            price_return = data_return[month_return]['days'][day_return]['lowestFare']
                             total_price = exchange_rate * (price_depart + price_return)
                             flight = Flight(departure=depart, destination=destination,
                                             depart_date=selected_date_depart_str,
