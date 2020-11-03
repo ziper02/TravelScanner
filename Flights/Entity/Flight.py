@@ -16,6 +16,7 @@ class Flight:
             self._label = label
             self._source = source
             self._set=set
+            self._calculated_value=-1
 
         else:
             self.__dict__.update(dict)
@@ -95,3 +96,11 @@ class Flight:
     def label(self, value):
         self._label = value
 
+    @property
+    def calculated_value(self):
+        return self._calculated_value
+
+
+    @calculated_value.setter
+    def calculated_value(self, value):
+        self._calculated_value = value

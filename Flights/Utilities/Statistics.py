@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 import matplotlib.pyplot as plt
 from Entity.Flight import Flight
-
+from Utilities import General as general
 
 def get_how_much_flights_per_airport():
     with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files_dict.json', 'r') as f:
@@ -26,23 +26,7 @@ def get_statistic_of_destination(name):
     :param name: The shortcut of the airport
     :return: graph of the airport
     """
-    with open(os.path.dirname(__file__) +
-              '/../../Data/Flights/json_files_dict.json', 'r') as f:
-        dict = json.load(f)
-    with open(os.path.dirname(__file__) +
-              '/../../Data/Flights/airports_countries.json', 'r') as f2:
-        shortcut_dict = json.load(f2)
-    if name in shortcut_dict:
-        fullname_airport = shortcut_dict[name]['airportName']
-    else:
-        return;
-    list = dict[fullname_airport]
-    flights_data = []
-    for json_file in list:
-        with open(os.path.dirname(__file__) + "/../../" + json_file) as f:
-            data = json.load(f)
-        for temp in data:
-            flights_data.append(Flight(**temp))
+    flights_data=general.get_data_by_name(name)
     flights_data_filtered = [flight for flight in flights_data if flight.label != -1]
     flights_days = [
         (datetime.strptime(flight.return_date, '%Y-%m-%d') - datetime.strptime(flight.depart_date, '%Y-%m-%d')).days
@@ -115,3 +99,30 @@ def get_statistic_of_dest_per_days(name, days):
                                                                              '%Y-%m-%d')).days == days]
     flight_list.sort(key=lambda x: x.price)
     print(flight_list[0])
+
+def get_calculated_value_for_location(name):
+    """
+    :param name: The shortcut of the airport
+    :return: get list of flights from airport with calculated value
+    """
+    flights_data=general.get_data_by_name(name)
+    with open(os.path.dirname(__file__) +
+              '/../../Data/Flights/calculatedValueForLocation.json', 'r') as f:
+        dict_val_for_location = json.load(f)
+    val_for_spesifc_location=dict_val_for_location[name]
+    filtered_flights_data=[]
+    for flight in flights_data:
+        days_of_trip=datetime.strptime(flight.return_date, '%Y-%m-%d')-datetime.strptime(flight.depart_date, '%Y-%m-%d')
+        if days_of_trip.days>2 and days_of_trip.days<8 and flight.price<2000:
+            flight.calculated_value=(flight.price/(days_of_trip.days))*val_for_spesifc_location[str(days_of_trip.days)]
+            filtered_flights_data.append(flight)
+    return filtered_flights_data
+
+
+def get_statistic_of_destination_temp(name):
+    flights_data=get_calculated_value_for_location(name)
+    x = [flight.price for flight in flights_data]
+    y = [flight.calculated_value for flight in flights_data]
+    plt.scatter(x, y, c="blue")
+    #plt.show()
+    return x,y

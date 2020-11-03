@@ -113,3 +113,27 @@ def filter_json_flights():
         Flight.filter_list_of_flights(flights_data)
         with open(os.path.dirname(__file__) + json_file, 'w', encoding='utf-8') as f:
             json.dump(flights_data, f, ensure_ascii=False, default=obj_dict, indent=4)
+
+def get_data_by_name(name):
+    """
+    :param name: The shortcut of the airport
+    :return: list of all flights of destention
+    """
+    with open(os.path.dirname(__file__) +
+              '/../../Data/Flights/json_files_dict.json', 'r') as f:
+        dict = json.load(f)
+    with open(os.path.dirname(__file__) +
+              '/../../Data/Flights/airports_countries.json', 'r') as f2:
+        shortcut_dict = json.load(f2)
+    if name in shortcut_dict:
+        fullname_airport = shortcut_dict[name]['airportName']
+    else:
+        return;
+    list = dict[fullname_airport]
+    flights_data = []
+    for json_file in list:
+        with open(os.path.dirname(__file__) + "/../../" + json_file) as f:
+            data = json.load(f)
+        for temp in data:
+            flights_data.append(Flight(**temp))
+    return flights_data
