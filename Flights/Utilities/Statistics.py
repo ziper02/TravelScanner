@@ -100,6 +100,9 @@ def get_statistic_of_dest_per_days(name, days):
     flight_list.sort(key=lambda x: x.price)
     print(flight_list[0])
 
+
+
+##TO REMOVE
 def get_calculated_value_for_location(name):
     """
     :param name: The shortcut of the airport
@@ -114,11 +117,58 @@ def get_calculated_value_for_location(name):
     for flight in flights_data:
         days_of_trip=datetime.strptime(flight.return_date, '%Y-%m-%d')-datetime.strptime(flight.depart_date, '%Y-%m-%d')
         if days_of_trip.days>2 and days_of_trip.days<8 and flight.price<2000:
-            flight.calculated_value=(flight.price/(days_of_trip.days))*val_for_spesifc_location[str(days_of_trip.days)]
+            flight.calculated_value=((pow(flight.price,0.2)/(days_of_trip.days))*val_for_spesifc_location[str(days_of_trip.days)])
             filtered_flights_data.append(flight)
     return filtered_flights_data
 
+## TO REMOVE
+def get_distribution_of_destination(name):
+    flights_data=get_calculated_value_for_location(name)
+    dict={
+        3:{
+            'x':[],
+            'y': []
+        },
+        4: {
+            'x': [],
+            'y': []
+        },
+        5: {
+            'x': [],
+            'y': []
+        },
+        6: {
+            'x': [],
+            'y': []
+        },
+        7: {
+            'x': [],
+            'y': []
+        }
 
+    }
+    for i in range(0,2000):
+        for j in range(3,8):
+            dict[j]['x'].append(i)
+            dict[j]['y'].append(0)
+    for flight in flights_data:
+        days_of_trip = datetime.strptime(flight.return_date, '%Y-%m-%d') - datetime.strptime(flight.depart_date,
+                                                                                             '%Y-%m-%d')
+        dict[days_of_trip.days]['y'][int(flight.price)]=dict[days_of_trip.days]['y'][int(flight.price)]+1
+    print(len(flights_data))
+    for i in range(3,8):
+        lst = []
+        print(f"{i} list :")
+        count = 0
+
+        for j in range(0,2000):
+            if dict[i]['y'][j]!=0:
+                lst.append([dict[i]['x'][j],dict[i]['y'][j]])
+                count=count+dict[i]['y'][j]
+        print(lst)
+        print(count)
+
+## TO REMOVE
 def get_statistic_of_destination_temp(name):
     flights_data=get_calculated_value_for_location(name)
     x = [flight.price for flight in flights_data]

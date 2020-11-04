@@ -3,7 +3,7 @@ import os
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-
+import re
 import Moderator
 from Entity.Airport import Airport
 from Entity.Flight import Flight
@@ -132,6 +132,34 @@ def get_data_by_name(name):
     list = dict[fullname_airport]
     flights_data = []
     for json_file in list:
+        with open(os.path.dirname(__file__) + "/../../" + json_file) as f:
+            data = json.load(f)
+        for temp in data:
+            flights_data.append(Flight(**temp))
+    return flights_data
+
+def get_updated_data_by_name(name):
+    """
+    :param name: The shortcut of the airport
+    :return: list of updated flights of destention
+    """
+    with open(os.path.dirname(__file__) +
+              '/../../Data/Flights/json_files_dict.json', 'r') as f:
+        dict = json.load(f)
+    with open(os.path.dirname(__file__) +
+              '/../../Data/Flights/airports_countries.json', 'r') as f2:
+        shortcut_dict = json.load(f2)
+    if name in shortcut_dict:
+        fullname_airport = shortcut_dict[name]['airportName']
+    else:
+        return;
+    list = dict[fullname_airport]
+    date_list_re=[re.search(r'\d{4}-\d{2}-\d{2}', item) for item in list]
+    date_list=[datetime.strptime(match.group(), '%Y-%m-%d').date() for match in date_list_re]
+    max_date = max(date_list).strftime("%Y-%m-%d")
+    updated_data_lst=[item for item in list if max_date in item]
+    flights_data = []
+    for json_file in updated_data_lst:
         with open(os.path.dirname(__file__) + "/../../" + json_file) as f:
             data = json.load(f)
         for temp in data:

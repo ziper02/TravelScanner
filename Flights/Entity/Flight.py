@@ -49,6 +49,13 @@ class Flight:
                     and self._price == other._price:
                 return True
         return False
+    def __lt__(self, other):
+        if isinstance(other, Flight):
+            return self._price<other._price
+
+    def __gt__(self, other):
+        if isinstance(other, Flight):
+            return self._price>other._price
 
     def __ne__(self, other):
         return not self.__eq__(other)
