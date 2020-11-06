@@ -7,6 +7,7 @@ import re
 import Moderator
 from Entity.Airport import Airport
 from Entity.Flight import Flight
+from Utilities import Statistics as statistics
 
 
 def update_json_files(flights, year_month_date_depart, destination):
@@ -101,18 +102,6 @@ def add_to_json_dict(json_file):
         json.dump(dict, f, ensure_ascii=False, indent=4)
 
 
-def filter_json_flights():
-    with open(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/json_files.json') as f:
-        json_files = json.load(f)
-    for json_file in json_files:
-        flights_data = []
-        with open(os.path.dirname(__file__) + json_file) as f:
-            data = json.load(f)
-        for temp in data:
-            flights_data.append(Flight(**temp))
-        Flight.filter_list_of_flights(flights_data)
-        with open(os.path.dirname(__file__) + json_file, 'w', encoding='utf-8') as f:
-            json.dump(flights_data, f, ensure_ascii=False, default=obj_dict, indent=4)
 
 def get_data_by_name(name):
     """
@@ -126,7 +115,7 @@ def get_data_by_name(name):
               '/../../Data/Flights/airports_countries.json', 'r') as f2:
         shortcut_dict = json.load(f2)
     if name in shortcut_dict:
-        fullname_airport = shortcut_dict[name]['airportName']
+        fullname_airport = shortcut_dict[Moderator.transfer_airport_cod_names_to_all(name)]['airportName']
     else:
         return;
     list = dict[fullname_airport]
@@ -137,6 +126,7 @@ def get_data_by_name(name):
         for temp in data:
             flights_data.append(Flight(**temp))
     return flights_data
+
 
 def get_updated_data_by_name(name):
     """
@@ -150,14 +140,14 @@ def get_updated_data_by_name(name):
               '/../../Data/Flights/airports_countries.json', 'r') as f2:
         shortcut_dict = json.load(f2)
     if name in shortcut_dict:
-        fullname_airport = shortcut_dict[name]['airportName']
+        fullname_airport = shortcut_dict[Moderator.transfer_airport_cod_names_to_all(name)]['airportName']
     else:
         return;
     list = dict[fullname_airport]
-    date_list_re=[re.search(r'\d{4}-\d{2}-\d{2}', item) for item in list]
-    date_list=[datetime.strptime(match.group(), '%Y-%m-%d').date() for match in date_list_re]
+    date_list_re = [re.search(r'\d{4}-\d{2}-\d{2}', item) for item in list]
+    date_list = [datetime.strptime(match.group(), '%Y-%m-%d').date() for match in date_list_re]
     max_date = max(date_list).strftime("%Y-%m-%d")
-    updated_data_lst=[item for item in list if max_date in item]
+    updated_data_lst = [item for item in list if max_date in item]
     flights_data = []
     for json_file in updated_data_lst:
         with open(os.path.dirname(__file__) + "/../../" + json_file) as f:
@@ -165,3 +155,4 @@ def get_updated_data_by_name(name):
         for temp in data:
             flights_data.append(Flight(**temp))
     return flights_data
+

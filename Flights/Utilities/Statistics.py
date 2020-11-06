@@ -4,7 +4,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 from Entity.Flight import Flight
 from Utilities import General as general
-
+import Moderator as mod
 def get_how_much_flights_per_airport():
     with open(os.path.dirname(__file__) + '/../../Data/Flights/json_files_dict.json', 'r') as f:
         dict = json.load(f)
@@ -71,6 +71,10 @@ def get_statistic_of_destination(name):
     axes.set_ylim([2.5, 7.5])
     axes.set_xlim([110, 1050])
     plt.legend(loc='upper right', fontsize=10, bbox_to_anchor=(1.1, 1.05), fancybox=True)
+    with open(os.path.dirname(os.path.abspath("__file__")) +
+              '/../Data/Flights/airports_countries.json', 'r') as f2:
+        shortcut_dict = json.load(f2)
+    plt.title(f'{name} - {shortcut_dict[mod.transfer_airport_cod_names_to_all(name)]["airportName"]} {shortcut_dict[mod.transfer_airport_cod_names_to_all(name)]["countryName"]}')
     plt.show()
     #return low_price_x, low_price_y, mid_price_x, mid_price_y, high_price_x, high_price_y
 
