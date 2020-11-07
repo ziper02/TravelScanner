@@ -6,7 +6,7 @@ from Entity.Airport import Airport
 class Flight:
 
     def __init__(self, departure=None, destination=None, depart_date=None, return_date=None, price=None,
-                 source=None,label=-1,set=-1,**dict):
+                 source=None,label=-1,data_set=-1,**dict):
         if departure!=None:
             self._departure = departure
             self._destination = destination
@@ -15,7 +15,7 @@ class Flight:
             self._price = price
             self._label = label
             self._source = source
-            self._set=set
+            self._data_set=data_set
             self._calculated_value=-1
 
         else:
@@ -63,11 +63,16 @@ class Flight:
     def __str__(self):
         return "Flight:: departure:  " + str(self._departure) + "\ndestination:  " + str(self._destination) + \
                "\ndepart date:  " + str(self._depart_date) + " return date:  " + str(self._return_date) + \
-               "\nprice:  " + str(self._price) + " label:  " + str(self._label)
+               "\nprice:  " + str(self._price) + " label:  " + str(self._label) + " data set:  " + str(self._data_set)
 
     @property
     def departure(self):
         return self._departure
+
+    @property
+    def days(self):
+        return (datetime.strptime(self.return_date, '%Y-%m-%d')
+                - datetime.strptime(self.depart_date, '%Y-%m-%d')).days
 
     @property
     def destination(self):
@@ -104,10 +109,11 @@ class Flight:
         self._label = value
 
     @property
-    def calculated_value(self):
-        return self._calculated_value
+    def data_set(self):
+        return self._data_set
 
 
-    @calculated_value.setter
-    def calculated_value(self, value):
-        self._calculated_value = value
+    @data_set.setter
+    def data_set(self, value):
+        self._data_set = value
+

@@ -103,7 +103,7 @@ def add_to_json_dict(json_file):
 
 
 
-def get_data_by_name(name):
+def get_data_by_name(name,json_file=False):
     """
     :param name: The shortcut of the airport
     :return: list of all flights of destention
@@ -124,7 +124,10 @@ def get_data_by_name(name):
         with open(os.path.dirname(__file__) + "/../../" + json_file) as f:
             data = json.load(f)
         for temp in data:
-            flights_data.append(Flight(**temp))
+            if not json_file:
+                flights_data.append(Flight(**temp))
+            else:
+                flights_data.append((Flight(**temp),json_file))
     return flights_data
 
 
@@ -156,3 +159,55 @@ def get_updated_data_by_name(name):
             flights_data.append(Flight(**temp))
     return flights_data
 
+
+def update_json_dest_by_list(flight_data):
+    """
+    :param flight_data: list of tuples with all destination's flight (flight,json_file)
+    :return: update the files
+    """
+    json_dict={}
+    for flight,json_file in flight_data:
+        if json_file not in json_dict.keys():
+            json_dict[json_file]=list()
+            json_dict[json_file].append(flight)
+        else:
+            json_dict[json_file].append(flight)
+    for json_file,flights_list in json_dict.items():
+        with open(os.path.dirname(__file__)+"/../../"+json_file,'w',encoding='utf-8') as f:
+            json.dump(flights_list,f,ensure_ascii=False,default=obj_dict,indent=4)
+
+def label_all_flights_by_price_range():
+    """
+    :return: label all the data by the price_range json
+    """
+    with open(os.path.dirname(__file__)+"/../../Data/Flights/dict_price_range.json",'r',encoding="utf-8") as f:
+        dict_price_range=json.load(f)
+    for dest_key,dest_value in dict_price_range.items():
+        dest_price_range=dict_price_range[dest_key]
+        flights_data=get_data_by_name(dest_key,json_file=True)
+        for flight_item in flights_data:
+            flight=flight_item[0]
+            flight.__dict__.pop('_set', None)
+            if flight.days < 3 or flight.days > 7:
+                flight.label = 0
+                flight.data_set="Train"
+                continue
+            dest_price_range_days=dest_price_range[str(flight.days)]
+            for label_key,label_value in dest_price_range_days.items():
+                low_price=float(re.split("-",label_value)[0])
+                high_price = float(re.split("-", label_value)[1])
+                if label_key=="very low price range" and low_price>flight.price:
+                    flight.label=4
+                elif label_key=="high price range" and high_price<flight.price:
+                    flight.label=1
+                elif flight.price>= low_price and flight.price<=high_price:
+                    if label_key=="very low price range":
+                        flight.label=4
+                    elif label_key=="low price range":
+                        flight.label=3
+                    elif label_key=="mid price range":
+                        flight.label=2
+                    else:
+                        flight.label=1
+                flight.data_set = "Train"
+        update_json_dest_by_list(flight_data=flights_data)
