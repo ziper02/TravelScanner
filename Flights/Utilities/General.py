@@ -103,7 +103,7 @@ def add_to_json_dict(json_file):
 
 
 
-def get_data_by_name(name,json_file=False):
+def get_data_by_name(name,add_json_file=False):
     """
     :param name: The shortcut of the airport
     :return: list of all flights of destention
@@ -124,7 +124,7 @@ def get_data_by_name(name,json_file=False):
         with open(os.path.dirname(__file__) + "/../../" + json_file) as f:
             data = json.load(f)
         for temp in data:
-            if not json_file:
+            if not add_json_file:
                 flights_data.append(Flight(**temp))
             else:
                 flights_data.append((Flight(**temp),json_file))
@@ -158,6 +158,14 @@ def get_updated_data_by_name(name):
         for temp in data:
             flights_data.append(Flight(**temp))
     return flights_data
+
+def get_all_updated_data():
+    with open(os.path.dirname(__file__)+"/../../Data/Flights/dict_rate_dest.json",'r') as f:
+        rate_dest=json.load(f)
+    flight_data=[]
+    for dest_key in rate_dest.keys():
+        flight_data.extend(get_updated_data_by_name(dest_key))
+    return flight_data
 
 
 def update_json_dest_by_list(flight_data):
@@ -211,3 +219,7 @@ def label_all_flights_by_price_range():
                         flight.label=1
                 flight.data_set = "Train"
         update_json_dest_by_list(flight_data=flights_data)
+
+def label_flight_by_price_range(flight):
+    with open(os.path.dirname(__file__)+"/../../Data/Flights/dict_price_range.json",'r',encoding="utf-8") as f:
+        dict_price_range=json.load(f)

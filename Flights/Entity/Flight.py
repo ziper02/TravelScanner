@@ -1,5 +1,5 @@
 from datetime import datetime
-
+import os,json
 from Entity.Airport import Airport
 
 
@@ -64,7 +64,10 @@ class Flight:
         return "Flight:: departure:  " + str(self._departure) + "\ndestination:  " + str(self._destination) + \
                "\ndepart date:  " + str(self._depart_date) + " return date:  " + str(self._return_date) + \
                "\nprice:  " + str(self._price) + " label:  " + str(self._label) + " data set:  " + str(self._data_set)
-
+    def pretty_print(self):
+        return "\ndestination:  " + str(self._destination.name)+" "+str(self._destination.country.name) + \
+               "\ndepart date:  " + str(self._depart_date) + " return date:  " + str(self._return_date) + \
+               "\nprice:  " + str(self._price)
     @property
     def departure(self):
         return self._departure
@@ -77,6 +80,12 @@ class Flight:
     @property
     def destination(self):
         return self._destination
+
+    @property
+    def destination_value(self):
+        with open(os.path.dirname(__file__) + "/../../Data/Flights/dict_rate_dest.json", 'r', encoding="utf-8") as f:
+            rate_dest = json.load(f)
+        return rate_dest[self._destination.code]
 
     @property
     def depart_date(self):
