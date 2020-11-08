@@ -7,7 +7,6 @@ import re
 import Moderator
 from Entity.Airport import Airport
 from Entity.Flight import Flight
-from Utilities import Statistics as statistics
 
 
 def update_json_files(flights, year_month_date_depart, destination):

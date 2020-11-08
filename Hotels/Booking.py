@@ -1,5 +1,6 @@
 import copy
 import os
+from datetime import datetime
 from pathlib import Path
 from threading import Thread
 
@@ -17,15 +18,14 @@ req_result = 15
 '''Receives a search_argument to insert it in the search bar and 
 then clicks the search button.(include dates)'''
 
-
-def fill_form_with_dates(driver, h):
+def fill_form_with_dates(driver, hotel):
     search_field = driver.find_element_by_id('ss')
-    search_field.send_keys(h.dest)
+    search_field.send_keys(hotel.destination)
     driver.find_element_by_class_name("sb-date-field__icon").click()
     while True:
         try:
-            driver.find_element_by_xpath("//td[@data-date='{start_date}']".format(start_date=h.start_date)).click()
-            driver.find_element_by_xpath("//td[@data-date='{end_date}']".format(end_date=h.end_date)).click()
+            driver.find_element_by_xpath("//td[@data-date='{start_date}']".format(start_date=hotel.start_date)).click()
+            driver.find_element_by_xpath("//td[@data-date='{end_date}']".format(end_date=hotel.end_date)).click()
             break;
         except:
             driver.find_element_by_class_name("bui-calendar__control--next").click()
@@ -38,7 +38,6 @@ def fill_form_with_dates(driver, h):
 '''Receives a search_argument to insert it in the search bar and 
 then clicks the search button.(without dates)'''
 
-
 def fill_form_without_dates(driver, location_name):
     search_field = driver.find_element_by_id('ss')
     search_field.send_keys(location_name)
@@ -50,15 +49,14 @@ def fill_form_without_dates(driver, location_name):
 
 '''Returns the data from n_results amount of results.'''
 
-
-def scrape_results(driver, n_results, h):
+def scrape_results(driver, n_results, hotel):
     accommodations_urls = get_all_hotel_links_per_driver(driver, n_results)
     accommodations_data = list()
-    with open(os.path.dirname(__file__)+'/../Data/Hotels/Locations_Data/{location}_data.json'.format(location=h.dest), 'r') as JSON:
+    with open(os.path.dirname(__file__)+'/../Data/Hotels/Locations_Data/{location}_data.json'.format(location=hotel.destination), 'r') as JSON:
         location_dict = json.load(JSON)
     my_range = list(range(0, n_results))
     for url in my_range:
-        url_data, can_order = scrape_accommodation_data(driver, accommodations_urls[url], h, location_dict)
+        url_data, can_order = scrape_accommodation_data(driver, accommodations_urls[url], hotel, location_dict)
         accommodations_data.append(url_data)
         if not can_order:
             n_results = n_results + 1
@@ -68,7 +66,6 @@ def scrape_results(driver, n_results, h):
 
 
 '''return all the hotels in dest'''
-
 
 def scrape_results_without_price(driver):
     accommodations_urls = get_all_hotel_links_per_driver(driver)
@@ -81,7 +78,6 @@ def scrape_results_without_price(driver):
 
 
 '''Visits an accommodation page and extracts the data without price.'''
-
 
 def scrape_accommodation_data_without_price(driver, accommodation_url):
     if driver == None:
@@ -125,7 +121,6 @@ def scrape_accommodation_data_without_price(driver, accommodation_url):
 
 '''return list of all the links of hotels in location,need to be already after searching the dest'''
 
-
 def get_all_hotel_links_per_driver(driver, n=None):
     page_list = list()
     accommodations_urls = list()
@@ -153,8 +148,7 @@ def get_all_hotel_links_per_driver(driver, n=None):
     if the hotel already in the data get all the info from the dataset and only get the price from site
     else get all the data from the site and also add him to the dataset without price '''
 
-
-def scrape_accommodation_data(driver, accommodation_url, h, location_dict):
+def scrape_accommodation_data(driver, accommodation_url, hotel, location_dict):
     driver.get(accommodation_url)
     key = driver.find_element_by_id('hp_hotel_name') \
         .text.strip('Hotel')
@@ -163,18 +157,17 @@ def scrape_accommodation_data(driver, accommodation_url, h, location_dict):
     else:
         accommodation_fields = scrape_accommodation_data_without_price(driver, accommodation_url)
         location_dict[key] = accommodation_fields
-        with open(os.path.dirname(__file__)+'/../Data/Hotels/Locations_Data/{location}_data.json'.format(location=h.dest), 'w') as f:
+        with open(os.path.dirname(__file__)+'/../Data/Hotels/Locations_Data/{location}_data.json'.format(location=hotel.destination), 'w') as f:
             f.write(json.dumps(location_dict, indent=4))
-    return scrape_accommodation_data_only_price_and_update_dates(driver, accommodation_fields, h)
+    return scrape_accommodation_data_only_price_and_update_dates(driver, accommodation_fields, hotel)
 
 
 '''Visits an accommodation page and extracts the price only , also update the dates for this price.'''
 
-
-def scrape_accommodation_data_only_price_and_update_dates(driver, accommodation_fields, h):
-    accommodation_fields['Country'] = h.dest
-    accommodation_fields['Check in'] = h.start_date
-    accommodation_fields['Check out'] = h.end_date
+def scrape_accommodation_data_only_price_and_update_dates(driver, accommodation_fields, hotel):
+    accommodation_fields['Country'] = hotel.destination
+    accommodation_fields['Check in'] = hotel.start_date
+    accommodation_fields['Check out'] = hotel.end_date
     try:
         temp_price = driver.find_element_by_class_name('bui-price-display__value').text
         can_order = True
@@ -187,34 +180,31 @@ def scrape_accommodation_data_only_price_and_update_dates(driver, accommodation_
 
 '''create JSON file with the data of location hotels in dates'''
 
-
-def get_data_of_location_hotel_in_dates(h):
+def get_data_of_location_hotel_in_dates(hotel):
     try:
         driver = Scanner.prepare_driver('https://www.booking.com')
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'ss')))
-        fill_form_with_dates(driver, h)
-        accommodations_data = scrape_results(driver, req_result, h)
+        fill_form_with_dates(driver, hotel)
+        accommodations_data = scrape_results(driver, req_result, hotel)
         accommodations_data = {item['name']: item for item in accommodations_data}  ## max need tp remove
-
         my_file = Path(
-            os.path.dirname(__file__)+'/../Data/Hotels/Order_Data/{location}_{start_date}_{end_date}.json'.format(location=h.dest, start_date=h.start_date,
-                                                                         end_date=h.end_date))
+            os.path.dirname(__file__)+'/../Data/Hotels/Order_Data/{location}/{today}_{start_date}_{end_date}.json'.format(location=hotel.destination,today=datetime.today().strftime('%Y-%m-%d'), start_date=hotel.start_date,
+                                                                         end_date=hotel.end_date))
         if my_file.is_file():
-            with open(os.path.dirname(__file__)+'/../Data/Hotels/Order_Data/{location}_{start_date}_{end_date}.json'.format(location=h.dest,
-                                                                                   start_date=h.start_date,
-                                                                                   end_date=h.end_date), 'r') as JSON:
+            with open(os.path.dirname(__file__)+'/../Data/Hotels/Order_Data/{location}/{today}_{start_date}_{end_date}.json'.format(location=hotel.destination,
+                                                                                   today=datetime.today().strftime('%Y-%m-%d'),start_date=hotel.start_date,
+                                                                                   end_date=hotel.end_date), 'r') as JSON:
                 location_dict = json.load(JSON)
             accommodations_data.update(location_dict)
         accommodations_data = json.dumps(accommodations_data, indent=4)
-        with open(os.path.dirname(__file__)+'/../Data/Hotels/Order_Data/{location}_{start_date}_{end_date}.json'.format(location=h.dest, start_date=h.start_date,
-                                                                               end_date=h.end_date), 'w') as f:
+        with open(os.path.dirname(__file__)+'/../Data/Hotels/Order_Data/{location}/{today}_{start_date}_{end_date}.json'.format(location=hotel.destination,today=datetime.today().strftime('%Y-%m-%d'), start_date=hotel.start_date,
+                                                                               end_date=hotel.end_date), 'w') as f:
             f.write(accommodations_data)
     finally:
         driver.quit()
 
 
 '''create data of hotels in location , if choose all - update all the destinations else update the req one'''
-
 
 def update_data_hotels(st='all'):
     if st == 'all':
@@ -230,7 +220,6 @@ def update_data_hotels(st='all'):
 
 
 '''create JSON file with all the hotels of choosen location'''
-
 
 def update_data_per_location_hotels_without_dates(location_name, sem=None):
     try:

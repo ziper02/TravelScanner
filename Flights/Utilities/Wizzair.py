@@ -1,6 +1,3 @@
-import os
-from pathlib import Path
-
 import requests
 from datetime import datetime, timedelta
 from tqdm import tqdm, trange
@@ -10,7 +7,7 @@ import Moderator
 from DataManager import data_manager
 from Entity.Airport import Airport
 from Entity.Flight import Flight
-from Utilities import SkyScanner, General
+from Utilities import General
 
 data = data_manager.Wizzair_data_structure
 whole_month_url = data_manager.Wizzair_whole_month_request

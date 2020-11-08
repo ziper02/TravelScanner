@@ -1,4 +1,3 @@
-import json
 import os
 import time
 from datetime import datetime
@@ -9,7 +8,7 @@ import Moderator
 from DataManager import data_manager
 from Entity.Airport import Airport
 from Entity.Flight import Flight
-from tqdm import tqdm, trange
+from tqdm import tqdm
 
 from Utilities import General
 

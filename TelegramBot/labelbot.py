@@ -5,7 +5,6 @@ import calendar
 from datetime import datetime
 
 from DataManager import data_manager
-from Flights.Utilities import SkyScanner
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler
 
