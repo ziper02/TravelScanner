@@ -222,3 +222,13 @@ def label_all_flights_by_price_range():
 def label_flight_by_price_range(flight):
     with open(os.path.dirname(__file__)+"/../../Data/Flights/dict_price_range.json",'r',encoding="utf-8") as f:
         dict_price_range=json.load(f)
+
+def get_list_of_all_destinations():
+    airports_code=set()
+    airports_code.update(Moderator.destination_list_wizzair)
+    airports_code.update(Moderator.destination_list_skyscanner)
+    airports_code.update(Moderator.destination_list_easyjet)
+    airports=[]
+    for airport_code in airports_code:
+        airports.append(Airport(Moderator.transfer_airport_cod_names_to_all(airport_code)))
+    return airports

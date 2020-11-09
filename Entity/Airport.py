@@ -29,25 +29,34 @@ class Airport:
         self.__config_attributes()
 
     @property
+    def city(self):
+        return self._city
+
+    @property
     def country(self):
         return self._country
 
     def __eq__(self, other):
         if isinstance(other, Airport):
-            return self.code == other.name and self.code == other.name and self.country == other.country
+            return self.code == other.name and self.code == other.name and self.country == other.country  and self._city == other._city
         return False
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __str__(self):
-        return 'Airport:: name: ' + self.name + ' code: ' + self.code + '\n' + str(self.country)
+        return 'Airport:: name: ' + self.name + ' code: ' + self.code + ' city: '+ self.city + '\n' + str(self.country)
 
     def __config_attributes(self, code=None):
         if code == None:
             code = self._code
-        with open(os.path.dirname(__file__) + '/../../Data/Flights/airports_countries.json') as f:
+        with open(os.path.dirname(__file__) + '/../Data/Flights/airports_countries.json') as f:
             data = json.load(f)
+            tessss=data[code]
             self._name = data[code]["airportName"]
             self._country = Country(name=data[code]["countryName"],
                                     code=data[code]["countryCode"])
+            try:
+                self._city=data[code]["city"]
+            except:
+                self._city=''

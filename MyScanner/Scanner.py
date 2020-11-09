@@ -16,7 +16,7 @@ def prepare_driver(url,prof=None):
     caps = DesiredCapabilities().CHROME
     caps["pageLoadStrategy"] = "normal"
     if platform.system()=='Windows':
-        driver = selenium.webdriver.Chrome(executable_path='C:\\Users\\ziper\\PycharmProjects\\TravelScanner\\chromedriver.exe', options=options,desired_capabilities=caps)
+        driver = selenium.webdriver.Chrome(executable_path='C:\\Users\\Ziv\\PycharmProjects\\TravelScanner\\chromedriver.exe', options=options,desired_capabilities=caps)
     else:
         driver = selenium.webdriver.Chrome(
             executable_path='/usr/bin/chromedriver', options=options,

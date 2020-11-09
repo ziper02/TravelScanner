@@ -1,6 +1,6 @@
 from Entity.Hotel import Hotel
 from Entity.Flight import Flight
-#hotel.destination
+from Hotels import Booking
 class Trip:
     
     def __init__(self,flight,hotel=None,alternative_hotels=[]):
@@ -41,3 +41,8 @@ class Trip:
     @destination.setter
     def destination(self, value):
         self._hotel.city=value
+
+    @flight.setter
+    def flight(self, value):
+        self._flight=value
+        Booking.get_data_of_location_hotel_in_dates(self)

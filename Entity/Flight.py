@@ -83,7 +83,7 @@ class Flight:
 
     @property
     def destination_value(self):
-        with open(os.path.dirname(__file__) + "/../../Data/Flights/dict_rate_dest.json", 'r', encoding="utf-8") as f:
+        with open(os.path.dirname(__file__) + "/../Data/Flights/dict_rate_dest.json", 'r', encoding="utf-8") as f:
             rate_dest = json.load(f)
         return rate_dest[self._destination.code]
 

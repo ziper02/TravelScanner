@@ -1,20 +1,27 @@
 class Hotel():
 
     def __init__(self,name='',city='',value_for_money=-1,staff=-1,facilities=-1
-                 ,location=-1,free_wifi=-1,cleanliness=-1,score=-1,popular_facilities=-1,comfort=-1,link=-1,price=-1):
-        self._name=name
-        self._city=city
-        self._value_for_money=value_for_money
-        self._staff=staff
-        self._facilities=facilities
-        self._location=location
-        self._free_wifi=free_wifi
-        self._cleanliness=cleanliness
-        self._score=score
-        self._popular_facilities=popular_facilities
-        self._comfort=comfort
-        self._link=link
-        self._price = price
+                 ,location=-1,free_wifi=-1,cleanliness=-1,score=-1
+                 ,popular_facilities=-1,comfort=-1,link=-1,address='',price=-1,check_in='',check_out='',**dict):
+        if name!='':
+            self._name=name
+            self._city=city
+            self._value_for_money=value_for_money
+            self._staff=staff
+            self._facilities=facilities
+            self._location=location
+            self._free_wifi=free_wifi
+            self._cleanliness=cleanliness
+            self._score=score
+            self._popular_facilities=popular_facilities
+            self._comfort=comfort
+            self._link=link
+            self._address=address
+            self._price = price
+            self._check_in=check_in
+            self._check_out=check_out
+        else:
+            self.__dict__.update(dict)
 
 
     @property
@@ -24,6 +31,22 @@ class Hotel():
     @name.setter
     def name(self, value):
         self._name=value
+
+    @property
+    def check_in(self):
+        return self._check_in
+
+    @check_in.setter
+    def check_in(self, value):
+        self._check_in=value
+
+    @property
+    def check_out(self):
+        return self._check_out
+
+    @check_out.setter
+    def check_out(self, value):
+        self._check_out=value
 
     @property
     def city(self):
@@ -121,3 +144,10 @@ class Hotel():
     def price(self, value):
         self._price = value
 
+    def __eq__(self, other):
+        if isinstance(other, Hotel):
+            return self.name == other.name and self._city == other._city
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
