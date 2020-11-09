@@ -1,8 +1,7 @@
 from datetime import datetime
-
+import json,os
 from Entity.Airport import Airport
 import Moderator as mod
-
 from Flights.Utilities import General as flight_general
 from Trip import Trip
 
@@ -19,4 +18,6 @@ for i in range(0,3):
     trip_list.append(Trip(flight))
 
 
-print("finished")
+for trip in trip_list:
+    print(trip.pretty_print())
+

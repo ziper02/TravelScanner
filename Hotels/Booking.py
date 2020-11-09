@@ -3,7 +3,8 @@ import os
 from datetime import datetime
 from pathlib import Path
 from threading import Thread
-
+import re
+import requests
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -24,7 +25,7 @@ def get_data_of_location_hotel_in_dates(trip):
     '''
     try:
 
-        driver = Scanner.prepare_driver_firefox('https://www.booking.com')
+        driver = Scanner.prepare_driver_chrome('https://www.booking.com')
 
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'ss')))
         fill_form_with_dates(driver, trip)
@@ -149,8 +150,18 @@ def scrape_accommodation_data_only_price_and_update_dates(driver, accommodation_
         temp_price = driver.find_element_by_class_name('bui-price-display__value').text
         can_order = True
     except Exception:
-        temp_price = 'no available'
-        can_order = False
+        try:
+            temp = driver.current_url.replace('.html', '.en-gb.html') + data_manager.Booking_order_address.format(
+                start_date=trip.start_date, end_date=trip.end_date)
+            headers ={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                              'Chrome/80.0.3987.149 Safari/537.36'}
+            request = requests.get(url=temp, headers=headers)
+            m = re.search(r'"b_price":"₪\s*([^\n$"]+)', request.text)
+            temp_price = int(m.group(1).replace(',', ''))
+            can_order = True
+        except Exception:
+            temp_price = 'no available'
+            can_order = False
     accommodation_fields['_fetch_date'] = datetime.today().strftime('%Y-%m-%d')
     accommodation_fields['_price'] = temp_price
     return accommodation_fields, can_order
@@ -211,7 +222,7 @@ def scrape_accommodation_data_without_price(driver, accommodation_url):
             for box_grade in all_box_grades:
                 temp_title_score = box_grade.find_element_by_class_name('c-score-bar__title').text
                 temp_grade_score = box_grade.find_element_by_class_name('c-score-bar__score').text
-                accommodation_fields["_" + temp_title_score.lower().replace(" ", "_")] = temp_grade_score
+                accommodation_fields["_" + temp_title_score.lower().rstrip().replace(" ", "_")] = temp_grade_score
         except:
             accommodation_fields['_location'] = '0'
     except:

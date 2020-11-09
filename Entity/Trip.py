@@ -14,7 +14,7 @@ class Trip:
         self._start_date=self._flight.depart_date
         self._hotel = Hotel(city=self.flight.destination.city)
         self.__update_hotels()
-        self._price=self._flight.price+self._hotel.price
+        self._price=2*(self._flight.price)+self._hotel.price
         
     @property
     def hotel(self) -> Hotel:
@@ -68,11 +68,15 @@ class Trip:
         hotels_data=[hotel for hotel in hotels_data if hotel.price!='no available']
         general_hotel.filter_by_location(hotels_data,8.5)
         general_hotel.filter_by_location(hotels_data, 8.5)
-        hotels_data=[hotel for hotel in hotels_data if isinstance(hotel.price, str)]
-        hotels_data.sort(key=lambda x: int(x.price), reverse=True)
+        hotels_data=[hotel for hotel in hotels_data if not isinstance(hotel.price, str)]
+        hotels_data.sort(key=lambda x: int(x.price), reverse=False)
         self._hotel=hotels_data.pop(0)
         self._alternative_hotels=hotels_data
 
 
+    def __str__(self):
+        return "Flight:\n"+self._flight+"\n"+"Hotel:\n"+self._hotel
 
-
+    def pretty_print(self):
+        return "Flight:"+self._flight.pretty_print()+"\n"+"Hotel:\n"+self._hotel.pretty_print()+\
+               "\n Total price: "+str(self._price)

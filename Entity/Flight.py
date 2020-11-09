@@ -64,6 +64,7 @@ class Flight:
         return "Flight:: departure:  " + str(self._departure) + "\ndestination:  " + str(self._destination) + \
                "\ndepart date:  " + str(self._depart_date) + " return date:  " + str(self._return_date) + \
                "\nprice:  " + str(self._price) + " label:  " + str(self._label) + " data set:  " + str(self._data_set)
+
     def pretty_print(self):
         return "\ndestination:  " + str(self._destination.name)+" "+str(self._destination.country.name) + \
                "\ndepart date:  " + str(self._depart_date) + " return date:  " + str(self._return_date) + \

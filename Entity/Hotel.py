@@ -151,3 +151,13 @@ class Hotel():
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __str__(self):
+        return "Hotel:: name: "+self._name+" city: "+self._city+" score: "+self._score+" location: "\
+               +self._location+" price: "+self._price+"\nvalue for money: "+self._value_for_money+" staff: "+self._staff\
+               +" location: "+self._location+" free wifi: "+self._free_wifi+"\ncleanliness: "+self._cleanliness\
+               +" comfort: "+self._comfort+" link: "+self._link+" address: "+self._address
+
+    def pretty_print(self):
+        return "name: " + self._name + " city: " + self._city + "\nscore: " + self._score + " location: " \
+               + self._location + " price: " + str(self._price)

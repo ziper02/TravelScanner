@@ -28,7 +28,7 @@ def filter_by_location(hotels_data, score: int):
     :rtype: list(Hotels)
     :type hotels_data: list(Hotels)
     """
-    hotels_data = [hotel for hotel in hotels_data if int(hotel.location) >= score]
+    hotels_data = [hotel for hotel in hotels_data if float(hotel.location) >= score]
 
 
 def filter_by_score(hotels_data, score: int) :
@@ -36,4 +36,4 @@ def filter_by_score(hotels_data, score: int) :
     :rtype: list(Hotels)
     :type hotels_data: list(Hotels)
     """
-    hotels_data = [hotel for hotel in hotels_data if int(hotel.score) >= score]
+    hotels_data = [hotel for hotel in hotels_data if float(hotel.score) >= score]

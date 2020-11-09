@@ -12,6 +12,7 @@ from selenium.webdriver.chrome.options import Options
 def prepare_driver_chrome(url,prof=None):
     options = Options()
     options.add_argument('-headless')
+    options.add_argument("--lang=en-gb");
     options.add_argument('window-size=1920x1080')
     caps = DesiredCapabilities().CHROME
     caps["pageLoadStrategy"] = "normal"
@@ -29,18 +30,18 @@ def prepare_driver_chrome(url,prof=None):
     return driver
 
 
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
-
-
-def prepare_driver_firefox(url):
-    options = Options()
-    options.headless = True
-    if platform.system() == 'Windows':
-        driver = webdriver.Firefox(options=options, executable_path=r'C:\\Users\\Ziv\\PycharmProjects\\TravelScanner\\geckodriver.exe')
-    try:
-        driver.get(url)
-    except Exception:
-        traceback.print_exc()
-    driver.implicitly_wait(0)
-    return driver
+# from selenium import webdriver
+# from selenium.webdriver.firefox.options import Options
+#
+#
+# def prepare_driver_firefox(url):
+#     options = Options()
+#     options.headless = True
+#     if platform.system() == 'Windows':
+#         driver = webdriver.Firefox(options=options, executable_path=r'C:\\Users\\Ziv\\PycharmProjects\\TravelScanner\\geckodriver.exe')
+#     try:
+#         driver.get(url)
+#     except Exception:
+#         traceback.print_exc()
+#     driver.implicitly_wait(0)
+#     return driver
