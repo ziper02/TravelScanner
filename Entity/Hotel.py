@@ -3,7 +3,7 @@ class Hotel():
     def __init__(self,name='',city='',value_for_money=-1,staff=-1,facilities=-1
                  ,location=-1,free_wifi=-1,cleanliness=-1,score=-1
                  ,popular_facilities=-1,comfort=-1,link=-1,address='',price=-1,check_in='',check_out='',**dict):
-        if name!='':
+        if city!='':
             self._name=name
             self._city=city
             self._value_for_money=value_for_money

@@ -146,10 +146,8 @@ def get_updated_data_by_name(name):
     else:
         return;
     list = dict[fullname_airport]
-    date_list_re = [re.search(r'\d{4}-\d{2}-\d{2}', item) for item in list]
-    date_list = [datetime.strptime(match.group(), '%Y-%m-%d').date() for match in date_list_re]
-    max_date = max(date_list).strftime("%Y-%m-%d")
-    updated_data_lst = [item for item in list if max_date in item]
+    today_date = datetime.today().strftime('%Y-%m-%d')
+    updated_data_lst = [item for item in list if today_date in item]
     flights_data = []
     for json_file in updated_data_lst:
         with open(os.path.dirname(__file__) + "/../../" + json_file) as f:
@@ -191,7 +189,7 @@ def label_all_flights_by_price_range():
         dict_price_range=json.load(f)
     for dest_key,dest_value in dict_price_range.items():
         dest_price_range=dict_price_range[dest_key]
-        flights_data=get_data_by_name(dest_key,json_file=True)
+        flights_data=get_data_by_name(dest_key,add_json_file=True)
         for flight_item in flights_data:
             flight=flight_item[0]
             flight.__dict__.pop('_set', None)
