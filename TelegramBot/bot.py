@@ -4,7 +4,7 @@ import platform
 import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-from DataManager import data_manager
+from data_manager import data_manager
 
 offical_group=0##enter the channel ID for get notifcations of bot
 log_group=1##enter channel ID for getting log of bot

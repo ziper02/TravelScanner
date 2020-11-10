@@ -1,8 +1,8 @@
 from datetime import datetime
 import json,os
 from Entity.Airport import Airport
-import Moderator as mod
-from Flights.Utilities import General as flight_general
+import moderator as mod
+from Flights.Utilities import general as flight_general
 from Trip import Trip
 
 

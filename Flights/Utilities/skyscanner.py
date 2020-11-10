@@ -4,13 +4,13 @@ from datetime import datetime
 from pathlib import Path
 import requests
 from dateutil.relativedelta import relativedelta
-import Moderator
-from DataManager import data_manager
+import moderator
+from data_manager import data_manager
 from Entity.Airport import Airport
 from Entity.Flight import Flight
 from tqdm import tqdm
 
-from Utilities import General
+from Utilities import general
 
 
 def export_whole_month_all_dest():
@@ -20,8 +20,8 @@ def export_whole_month_all_dest():
     """
     date_selected = datetime.today()
     dates = []
-    depart_list=[Airport(code=o) for o in Moderator.depart_list]
-    destination_list=[Airport(code=o) for o in Moderator.destination_list_skyscanner]
+    depart_list=[Airport(code=o) for o in moderator.depart_list]
+    destination_list=[Airport(code=o) for o in moderator.destination_list_skyscanner]
     for i in range(11):
         dates.append(date_selected)
         date_selected = date_selected + relativedelta(months=1)
@@ -71,6 +71,6 @@ def export_whole_month(depart=None, destination=None, date=None):
                 flights.append(flight)
             j = j + 1
         i = i + 1
-    General.update_json_files(flights=flights,year_month_date_depart=selected_month,destination=destination)
+    general.update_json_files(flights=flights, year_month_date_depart=selected_month, destination=destination)
 
 

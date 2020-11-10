@@ -1,15 +1,15 @@
 import time
 from datetime import datetime
-from Data import DataManager as data_manager
+from Data import data_manager
 
 import requests
 from dateutil.relativedelta import relativedelta
 from tqdm import tqdm
-import Moderator
-from DataManager import data_manager
+import moderator
+from data_manager import data_manager
 from Entity.Airport import Airport
 from Entity.Flight import Flight
-from Utilities import General
+from Utilities import general
 
 whole_month_url = data_manager.Easyjet_whole_month_request
 
@@ -23,8 +23,8 @@ def export_whole_months_all_dest():
     Fetch data from Easyjet.com for all the detentions from TLV,
     and save the data as json in Data\Flights folder.
     """
-    depart_list = [Airport(code=o) for o in Moderator.depart_list]
-    destination_list = [Airport(code=o) for o in Moderator.destination_list_easyjet]
+    depart_list = [Airport(code=o) for o in moderator.depart_list]
+    destination_list = [Airport(code=o) for o in moderator.destination_list_easyjet]
     for depart in depart_list:
         t_progress_bar_destination = tqdm(destination_list, leave=True)
         for destination in t_progress_bar_destination:
@@ -58,7 +58,7 @@ def export_whole_months(depart=None, destination=None):
     data_return = data_return_hash["months"]
     try:
         year_month_day_date_return_str = str(
-            data_return[len(data_return) - 1]["year"]) + '-' + Moderator.month_string_to_number(
+            data_return[len(data_return) - 1]["year"]) + '-' + moderator.month_string_to_number(
             data_return[len(data_return) - 1]["monthDisplayName"]) + '-' \
                                          + str(len(data_return[len(data_return) - 1]['days']))
     except Exception:
@@ -66,7 +66,7 @@ def export_whole_months(depart=None, destination=None):
     return_max_date_datetime = datetime.strptime(year_month_day_date_return_str, '%Y-%m-%d')
     flights = []
     for month in data_depart:
-        year_month_date_depart = str(month["year"]) + '-' + Moderator.month_string_to_number(month["monthDisplayName"])
+        year_month_date_depart = str(month["year"]) + '-' + moderator.month_string_to_number(month["monthDisplayName"])
         days = month['days']
         day_index = 0
         for day in days:
@@ -98,6 +98,6 @@ def export_whole_months(depart=None, destination=None):
                                             return_date=selected_date_return_str, price=total_price, source='Easyjet')
                             flights.append(flight)
             day_index = day_index + 1
-        General.update_json_files(flights=flights, year_month_date_depart=year_month_date_depart,
+        general.update_json_files(flights=flights, year_month_date_depart=year_month_date_depart,
                                   destination=destination)
         flights = []

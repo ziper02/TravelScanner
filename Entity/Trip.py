@@ -1,10 +1,10 @@
 import json
 import os
 from datetime import datetime
-from Hotels import General as general_hotel
+from Hotels import general as general_hotel
 from Entity.Hotel import Hotel
 from Entity.Flight import Flight
-from Hotels import Booking
+from Hotels import booking_automation
 
 class Trip:
     
@@ -63,7 +63,7 @@ class Trip:
         """
         :param fetch_date:get hotel list in selected fetch date
         """
-        Booking.get_data_of_location_hotel_in_dates(self)
+        booking_automation.get_data_of_location_hotel_in_dates(self)
         hotels_data=general_hotel.get_data_by_name(self,fetch_date)
         hotels_data=[hotel for hotel in hotels_data if hotel.price!='no available']
         general_hotel.filter_by_location(hotels_data,8.5)

@@ -1,7 +1,7 @@
 import json
 import os
 from datetime import datetime
-
+from threading import Semaphore, Thread
 from Hotel import Hotel
 from Entity.Trip import Trip
 from enum import Enum
@@ -10,7 +10,9 @@ import platform
 import selenium
 from selenium.webdriver import Chrome, DesiredCapabilities
 from selenium.webdriver.chrome.options import Options
-
+import booking_requests
+import booking_automation
+from Flights.Utilities import general as flight_general
 
 class ByTechnique(Enum):
     selenium = 1
@@ -90,3 +92,29 @@ def prepare_driver_chrome(url):
         traceback.print_exc()
     driver.implicitly_wait(0)
     return driver
+
+
+def update_data_hotels(destination='all',by_technique=ByTechnique.selenium):
+    """
+    create json with data of hotels in location at Data/Hotel/Location/{destination}.json,
+    if chose all(by default)- update all the destinations else update the required one.
+    :param destination:The full name of destination to update,the default is to update all
+    :type destination: str
+    :param by_technique:
+    :type by_technique: ByTechnique
+    """
+    sem = Semaphore(3)
+    if by_technique == ByTechnique.selenium:
+        fetch_technique_function = booking_automation.update_data_per_location_hotels_without_dates
+    else:
+        fetch_technique_function = booking_requests.update_data_per_location_hotels_without_dates
+    if destination == 'all':
+        airports_list = flight_general.get_list_of_all_destinations()
+        destinations = {airport.city for airport in airports_list}
+        for location in destinations:
+            sem.acquire()
+            thread = Thread(target=fetch_technique_function, args=(location, sem))
+            thread.start()
+        thread.join()
+    else:
+        fetch_technique_function(destination)

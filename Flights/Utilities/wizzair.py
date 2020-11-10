@@ -2,11 +2,11 @@ import requests
 from datetime import datetime, timedelta
 from tqdm import tqdm, trange
 import json
-import Moderator
-from DataManager import data_manager
+import moderator
+from data_manager import data_manager
 from Entity.Airport import Airport
 from Entity.Flight import Flight
-from Utilities import General
+from Utilities import general
 
 
 def export_whole_month_all_dest():
@@ -15,8 +15,8 @@ def export_whole_month_all_dest():
     parse him to Flight format and save the data as json in Data\Flights folder.
     """
     flights_data = fetch_data()
-    destinations = Moderator.destination_list_wizzair
-    departs = Moderator.depart_list
+    destinations = moderator.destination_list_wizzair
+    departs = moderator.depart_list
     for depart in departs:
         depart_flight = Airport(depart)
         t_progress_bar_destination = tqdm(destinations, leave=True)
@@ -60,7 +60,7 @@ def export_whole_month_all_dest():
                     flight_item.depart_date = datetime.strftime(flight_item.depart_date, "%Y-%m-%d")
                     flight_item.return_date = datetime.strftime(flight_item.return_date, "%Y-%m-%d")
             for key in dict:
-                General.update_json_files(flights=dict[key], year_month_date_depart=key, destination=destination_flight)
+                general.update_json_files(flights=dict[key], year_month_date_depart=key, destination=destination_flight)
 
 
 def alter_price(flights):
@@ -86,7 +86,7 @@ def fetch_data():
         data["flightList"][1]["to"] = (base + timedelta(days=(period + 1) * 42)).strftime("%Y-%m-%d")
         price_type = "regular"
         data["priceType"] = price_type
-        destinations = Moderator.destination_list_wizzair
+        destinations = moderator.destination_list_wizzair
         for destination in destinations:
             t_progress_bar_destination.set_description("Wizzair fetch " + destination)
             t_progress_bar_destination.refresh()

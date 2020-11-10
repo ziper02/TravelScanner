@@ -4,12 +4,12 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 import re
-import Moderator
+import moderator
 from Entity.Airport import Airport
 from Entity.Flight import Flight
-from Utilities import SkyScanner as ss
-from Utilities import EasyJet as ej
-from Utilities import Wizzair as wz
+from Utilities import skyscanner as ss
+from Utilities import easyjet as ej
+from Utilities import wizzair as wz
 
 
 def fetch_data():
@@ -33,7 +33,7 @@ def update_json_files(flights, year_month_date_depart, destination):
     """
     if len(flights) != 0:
         file_name = datetime.today().strftime('%Y-%m-%d')
-        dest_all_for_name = Airport(Moderator.transfer_airport_cod_names_to_all(destination.code))
+        dest_all_for_name = Airport(moderator.transfer_airport_cod_names_to_all(destination.code))
         Path(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + year_month_date_depart).mkdir(
             parents=True,
             exist_ok=True)
@@ -141,7 +141,7 @@ def get_files_list_of_location(name):
               '/../../Data/Flights/airports_countries.json', 'r') as f2:
         shortcut_dict = json.load(f2)
     if name in shortcut_dict:
-        fullname_airport = shortcut_dict[Moderator.transfer_airport_cod_names_to_all(name)]['airportName']
+        fullname_airport = shortcut_dict[moderator.transfer_airport_cod_names_to_all(name)]['airportName']
     else:
         return
     return dict[fullname_airport]
@@ -244,10 +244,10 @@ def get_list_of_all_destinations():
     :rtype:list(Airport)
     """
     airports_code = set()
-    airports_code.update(Moderator.destination_list_wizzair)
-    airports_code.update(Moderator.destination_list_skyscanner)
-    airports_code.update(Moderator.destination_list_easyjet)
+    airports_code.update(moderator.destination_list_wizzair)
+    airports_code.update(moderator.destination_list_skyscanner)
+    airports_code.update(moderator.destination_list_easyjet)
     airports = []
     for airport_code in airports_code:
-        airports.append(Airport(Moderator.transfer_airport_cod_names_to_all(airport_code)))
+        airports.append(Airport(moderator.transfer_airport_cod_names_to_all(airport_code)))
     return airports
