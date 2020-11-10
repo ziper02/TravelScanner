@@ -19,6 +19,10 @@ exchange_rate = request_currency.json()['EUR_ILS']
 
 
 def export_whole_months_all_dest():
+    """
+    Fetch data from Easyjet.com for all the detentions from TLV,
+    and save the data as json in Data\Flights folder.
+    """
     depart_list = [Airport(code=o) for o in Moderator.depart_list]
     destination_list = [Airport(code=o) for o in Moderator.destination_list_easyjet]
     for depart in depart_list:
@@ -31,6 +35,13 @@ def export_whole_months_all_dest():
 
 
 def export_whole_months(depart=None, destination=None):
+    """
+    Fetch data from Easyjet.com for destination's airport from departure's airport
+    :param depart: The airport that the flight depart
+    :type depart: Airport
+    :param destination: The destination of the flight
+    :type destination: Airport
+    """
     date_str = datetime.today().strftime('%Y-%m-%d')
     request_whole_month_url = whole_month_url.format(depart=depart.code, destination=destination.code,
                                                      depart_date=date_str)

@@ -74,7 +74,7 @@ def scrape_accommodation_data(driver, accommodation_url, trip, location_dict):
     :type driver: selenium.webdriver.chrome.webdriver.WebDriver
     :param accommodation_url:list of all the url's that need to scrape
     :type accommodation_url: list(str)
-    :param trip:the detention with check-in and check-out
+    :param trip:the destination with check-in and check-out
     :type trip: Trip
     :param location_dict:dict with all known data from Location data
     :type location_dict: dict()
@@ -98,10 +98,10 @@ def scrape_accommodation_data(driver, accommodation_url, trip, location_dict):
 
 def fill_form_with_dates(driver, trip):
     """
-    Receives a Trip with detention and checkin and checkout to insert
+    Receives a Trip with destination and checkin and checkout to insert
     it in the search bar and then clicks the search button.
     :type driver: selenium.webdriver.chrome.webdriver.WebDriver
-    :param trip:the detention with check-in and check-out
+    :param trip:the destination with check-in and check-out
     :type trip: Trip
     """
     search_field = driver.find_element_by_id('ss')
@@ -122,12 +122,12 @@ def fill_form_with_dates(driver, trip):
 
 def scrape_results(driver, n_results, trip):
     """
-    Fetch data including price from Booking.com of Trip.detention between between two dates
+    Fetch data including price from Booking.com of Trip.destination between between two dates
     (trip.start_date until trip.end_date)
     :type driver: selenium.webdriver.chrome.webdriver.WebDriver
     :param n_results: how much hotel to scrape
     :type n_results: int
-    :param trip:the detention with check-in and check-out
+    :param trip:the destination with check-in and check-out
     :type trip: Trip
     :return: dict{"hotel_name":data} of hotels with all the the data that required
     :rtype: dict
@@ -151,7 +151,7 @@ def scrape_accommodation_data_only_price_and_update_dates(driver, accommodation_
     :type driver: selenium.webdriver.chrome.webdriver.WebDriver
     :param accommodation_fields:The data of specific hotel dict{"hotel_name":data} without price and dates
     :type accommodation_fields: dict
-    :param trip:the detention with check-in and check-out
+    :param trip:the destination with check-in and check-out
     :type trip: Trip
     :return: dict{"hotel_name":data} of the specific hotel with price and dates
     :rtype: dict
@@ -185,7 +185,7 @@ def fill_form_without_dates(driver, location_name):
     Receives a city name to insert it in the search bar and
     then clicks the search button.(without dates)
     :type driver: selenium.webdriver.chrome.webdriver.WebDriver
-    :param location_name: The name of detention
+    :param location_name: The name of destination
     :type location_name: str
     """
     search_field = driver.find_element_by_id('ss')
@@ -292,7 +292,7 @@ def get_all_hotel_links_per_driver(driver, n=None):
 
 def update_data_hotels(st='all'):
     """
-    create json with data of hotels in location at Data/Hotel/Location/{detention}.json,
+    create json with data of hotels in location at Data/Hotel/Location/{destination}.json,
     if chose all(by default)- update all the destinations else update the required one.
     :param st:The full name of destination to update,the default is to update all
     :type st: str
@@ -312,7 +312,7 @@ def update_data_hotels(st='all'):
 def update_data_per_location_hotels_without_dates(location_name, sem=None):
     """
     create json with data of hotels in location at
-    Data/Hotel/Location/{detention}.json for the required one.
+    Data/Hotel/Location/{destination}.json for the required one.
     :param sem: semaphore for multithreading fetch
     :param location_name:The full name of destination to update
     :type st: str

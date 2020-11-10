@@ -23,3 +23,5 @@ from Trip import Trip
 # for trip in trip_list:
 #     print(trip.pretty_print())
 #
+
+flight_general.get_updated_data_by_name('AMS')

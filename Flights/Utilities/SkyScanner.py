@@ -12,10 +12,12 @@ from tqdm import tqdm
 
 from Utilities import General
 
-whole_month_url = data_manager.SkyScanner_whole_month_request
-
 
 def export_whole_month_all_dest():
+    """
+    Fetch data from SkyScanner.com for all the detentions from TLV,
+    and save the data as json in Data\Flights folder.
+    """
     date_selected = datetime.today()
     dates = []
     depart_list=[Airport(code=o) for o in Moderator.depart_list]
@@ -34,11 +36,20 @@ def export_whole_month_all_dest():
 
 
 def export_whole_month(depart=None, destination=None, date=None):
+    """
+    Fetch data from SkyScanner.com for destination's airport from departure's airport of the selected month
+    :param depart: The airport that the flight depart
+    :type depart: Airport
+    :param destination: The destination of the flight
+    :type destination: Airport
+    :param date: Date of the required month for fetch
+    :type date: datetime
+    """
     selected_month = date.strftime('%Y-%m')
     Path(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month).mkdir(parents=True, exist_ok=True)
     Path(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month + '/' + destination.name).mkdir(
         parents=True, exist_ok=True)
-    request_whole_month_url = whole_month_url.format(depart=depart.code, destination=destination.code,
+    request_whole_month_url = data_manager.SkyScanner_whole_month_request.format(depart=depart.code, destination=destination.code,
                                                      selected_month=selected_month)
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'}
     request = requests.get(url=request_whole_month_url, headers=headers)
