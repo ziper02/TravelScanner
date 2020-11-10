@@ -18,6 +18,7 @@
           <option value="range.__getitem__" />
           <option value="labelbot.file_loaded" />
           <option value="Tester.false" />
+          <option value="Trip.*" />
         </list>
       </option>
     </inspection_tool>
