@@ -1,45 +1,120 @@
-import json
-import os
 import re
 from datetime import datetime
-from threading import Semaphore
-
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-import booking_automation
-from Hotels import general as hotel_general
-
+import fetch_utility
 import requests
 from data_manager import data_manager
 
 
+def scrape_accommodation_data(accommodation_url, trip, location_dict):
+    """
+    Visits an accommodation page and extracts the all the data(score,price,etc..).
+    if the trip already in the data get all the info from the dataset and only get the price from site
+    else get all the data from the site and also add him to the dataset without price
+    :param accommodation_url:list of all the url's that need to scrape
+    :type accommodation_url: list(str)
+    :param trip:the destination with check-in and check-out
+    :type trip: Trip.Trip
+    :param location_dict:dict with all known data from Location data
+    :type location_dict: dict()
+    :return:Hotel with all his data including prices between the dates
+    :rtype: dict()
+    """
+    request_url = accommodation_url.replace('.html', '.en-gb.html') + data_manager.booking_order_address.format(
+        start_date=trip.start_date, end_date=trip.end_date)
+    request = requests.get(url=request_url, headers=data_manager.booking_headers)
+    page = request.text
+    html_page = re.split(page, '\n')
+    key = None
+    for i in range(len(html_page)):
+        line = html_page[i]
+        if 'id="hp_hotel_name"' in line:
+            lst = []
+            while '</h2>' not in line:
+                lst.append(line)
+                i = i + 1
+                line = html_page[i]
+            pre = re.search(r'>(.*?)<', lst[-2]).group(1).replace('\n', ' ')
+            hotel_name = lst[-1].rstrip()
+            key = pre + ' ' + hotel_name
+    accommodation_fields = fetch_utility.get_hotel_data(page, key, location_dict,
+                                                        by_technique=fetch_utility.ByTechnique.requests)
+    if accommodation_fields is not None:
+        return scrape_accommodation_data_only_price_and_update_dates(accommodation_fields, trip, page)
+    else:
+        return None
 
-def update_data_per_location_hotels_without_dates(location_name, sem=None):
+
+def scrape_accommodation_data_without_price(page='', accommodation_url='', need_fetch=False):
     """
-    create json with data of hotels in location atData/Hotel/Location/{destination}.json
-    for the required one using automation for get hotel links and GET requests for get data of hotels
-    :param location_name:The full name of destination to update
-    :type location_name: str
-    :param sem: semaphore for multithreading fetch
-    :type sem: threading.Semaphore
+    extracts the all the data(without price) from HTML page.
+    :param page:html page of hotel from booking.com
+    :type page: str
+    :param accommodation_url: the url of page hotel in booking
+    :type accommodation_url: str
+    :param need_fetch: True if need to use selenium for fetch data of hotel,otherwise false
+    :type need_fetch: bool
+    :return:Hotel with all his data without price
+    :rtype: dict()
     """
-    try:
-        driver = hotel_general.prepare_driver_chrome('https://www.booking.com')
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'ss')))
-        booking_automation.fill_form_without_dates(driver, location_name)
-        accommodations_urls = booking_automation.get_all_hotel_links_per_driver(driver)
-        accommodations_data = list()
-        for url in range(0, len(accommodations_urls)):
-            url_data = scrape_accommodation_data_without_price(driver, accommodations_urls[url])
-            accommodations_data.append(url_data)
-        accommodations_data = {item['_name']: item for item in accommodations_data}  ## max need tp remove
-        with open(os.path.dirname(__file__) + '/../Data/Hotels/Locations Data/{location}.json'.format(
-                location=location_name), 'w', encoding="utf-8") as f:
-            json.dump(accommodations_data, f, indent=4)
-    finally:
-        if sem is not None:
-            sem.release()
+    if need_fetch:
+        request_url = accommodation_url.replace('.html', '.en-gb.html')
+        try:
+            request = requests.get(url=request_url, headers=data_manager.booking_headers)
+        except Exception:
+            return None
+        page = request.text
+    accommodation_fields = dict()
+    accommodation_fields['_link'] = accommodation_url
+    found = False
+    count = 0
+    html_page = page.splitlines()
+    for i in range(len(html_page)):
+        line = html_page[i]
+        if count < 500:
+            if '<div class="c-score-bar" ><span class="c-score-bar__title">' in line:
+                if not found:
+                    found = True
+                m = re.split('<div class="c-score-bar" ><span class="c-score-bar__title">', line)
+                m2 = re.split('<span class="c-score-bar__score">', line)
+                if '&nbsp' in m[1]:
+                    temp = re.split('&nbsp', m[1])
+                    title = temp[0]
+                else:
+                    temp = re.split('<', m[1])
+                    title = temp[0]
+                temp = re.split('</span', m2[1])
+                score = temp[0]
+                title = "_" + title.lower().rstrip().replace(" ", "_")
+                accommodation_fields[title] = score
+            if 'hp_address_subtitle' in line:
+                lst = []
+                while '</span>' not in line:
+                    lst.append(line)
+                    i = i + 1
+                    line = html_page[i]
+                address = lst[-1].rstrip()
+                accommodation_fields['_address'] = address
+            if 'important_facility  "' in line:
+                i = i + 1
+                line = html_page[i]
+                if '_popular_facilities' not in accommodation_fields.keys():
+                    accommodation_fields['_popular_facilities'] = []
+                facility = re.findall('"([^"]*)"', line)[0]
+                accommodation_fields['_popular_facilities'].append(facility)
+            if 'id="hp_hotel_name"' in line:
+                lst = []
+                while '</h2>' not in line:
+                    lst.append(line)
+                    i = i + 1
+                    line = html_page[i]
+                pre = re.search(r'>(.*?)<', lst[-2]).group(1).replace('\n', ' ')
+                hotel_name = lst[-1].rstrip()
+                accommodation_fields['_name'] = pre + ' ' + hotel_name
+            if found:
+                count = count + 1
+        elif found:
+            break
+    return accommodation_fields
 
 
 def scrape_accommodation_data_only_price_and_update_dates(accommodation_fields, trip, page='', make_get_request=False):
@@ -49,7 +124,7 @@ def scrape_accommodation_data_only_price_and_update_dates(accommodation_fields, 
     :param accommodation_fields:The data of specific hotel dict{"hotel_name":data} without price and dates
     :type accommodation_fields: dict
     :param trip:the destination with check-in and check-out
-    :type trip: Trip
+    :type trip: Trip.Trip
     :param page: if make_get_request is false its html page of hotel from booking.com
                 else its url of hotel from booking.com
     :type page: str
@@ -76,65 +151,3 @@ def scrape_accommodation_data_only_price_and_update_dates(accommodation_fields, 
     accommodation_fields['_fetch_date'] = datetime.today().strftime('%Y-%m-%d')
     accommodation_fields['_price'] = price
     return accommodation_fields, can_order
-
-
-def scrape_accommodation_data_without_price(page, accommodation_url):
-    """
-    extracts the all the data(without price) from HTML page.
-    :param page:html page of hotel from booking.com
-    :type page: str
-    :param accommodation_url: the url of page hotel in booking
-    :type accommodation_url: str
-    :return:Hotel with all his data without price
-    :rtype: dict()
-    """
-    accommodation_fields = dict()
-    accommodation_fields['_link'] = accommodation_url
-    found = False
-    count = 0
-    html_page = re.split(page, '\n')
-    for line in html_page:
-        if count < 500:
-            if '<div class="c-score-bar" ><span class="c-score-bar__title">' in line:
-                if not found:
-                    found = True
-                m = re.split('<div class="c-score-bar" ><span class="c-score-bar__title">', line)
-                m2 = re.split('<span class="c-score-bar__score">', line)
-                if '&nbsp' in m[1]:
-                    temp = re.split('&nbsp', m[1])
-                    title = temp[0]
-                else:
-                    temp = re.split('<', m[1])
-                    title = temp[0]
-                temp = re.split('</span', m2[1])
-                score = temp[0]
-                title = "_" + title.lower().rstrip().replace(" ", "_")
-                accommodation_fields[title] = score
-            if 'id="hp_hotel_name"' in line:
-                lst = []
-                while not '</h2>' in line:
-                    lst.append(line)
-                    line = next(html_page)
-                hotel_name = lst[-1].rstrip()
-                accommodation_fields['_name'] = hotel_name
-            if 'hp_address_subtitle' in line:
-                lst = []
-                while not '</span>' in line:
-                    lst.append(line)
-                    line = next(html_page)
-                address = lst[-1].rstrip()
-                accommodation_fields['_address'] = address
-            if 'important_facility  "' in line:
-                line = next(html_page)
-                if '_popular_facilities' not in accommodation_fields.keys():
-                    accommodation_fields['_popular_facilities'] = []
-                facility = re.findall('"([^"]*)"', line)[0]
-                accommodation_fields['_popular_facilities'].append(facility)
-            if found:
-                count = count + 1
-        elif found:
-            break
-    return accommodation_fields
-
-
-

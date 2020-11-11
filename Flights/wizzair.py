@@ -6,13 +6,13 @@ import moderator
 from data_manager import data_manager
 from Entity.Airport import Airport
 from Entity.Flight import Flight
-from Utilities import general
+from Flights import general
 
 
 def export_whole_month_all_dest():
     """
     Fetch data from Wizzair.com for all the detentions from TLV,
-    parse him to Flight format and save the data as json in Data\Flights folder.
+    parse him to Flight format and save the data as json in Data\\Flights folder.
     """
     flights_data = fetch_data()
     destinations = moderator.destination_list_wizzair
@@ -28,10 +28,10 @@ def export_whole_month_all_dest():
             t_progress_bar_destination.refresh()
             for flight_data in flights_data:
                 if flight_data["departureStation"] == depart_flight.code and flight_data[
-                    "arrivalStation"] == destination_flight.code:
+                                                        "arrivalStation"] == destination_flight.code:
                     depart_destination_list.append(flight_data)
                 elif flight_data["departureStation"] == destination_flight.code and flight_data[
-                    "arrivalStation"] == depart_flight.code:
+                                                        "arrivalStation"] == depart_flight.code:
                     destination_depart_list.append(flight_data)
             for flight in depart_destination_list:
                 flight["departureDate"] = datetime.strptime(flight["departureDate"][0:10], '%Y-%m-%d')
@@ -48,19 +48,20 @@ def export_whole_month_all_dest():
                                                       source="Wizzair"))
             flights_filter = [flight for flight in combination_flights if
                               3 <= (flight.return_date - flight.depart_date).days < 7]
-            dict = {}
+            flights_per_year_month_dict = {}
             for flight_item in flights_filter:
-                if datetime.strftime(flight_item.depart_date, "%Y-%m") in dict:
-                    dict[datetime.strftime(flight_item.depart_date, "%Y-%m")].append(flight_item)
+                if datetime.strftime(flight_item.depart_date, "%Y-%m") in flights_per_year_month_dict:
+                    flights_per_year_month_dict[datetime.strftime(flight_item.depart_date, "%Y-%m")].append(flight_item)
                     flight_item.depart_date = datetime.strftime(flight_item.depart_date, "%Y-%m-%d")
                     flight_item.return_date = datetime.strftime(flight_item.return_date, "%Y-%m-%d")
                 else:
-                    dict[datetime.strftime(flight_item.depart_date, "%Y-%m")] = []
-                    dict[datetime.strftime(flight_item.depart_date, "%Y-%m")].append(flight_item)
+                    flights_per_year_month_dict[datetime.strftime(flight_item.depart_date, "%Y-%m")] = []
+                    flights_per_year_month_dict[datetime.strftime(flight_item.depart_date, "%Y-%m")].append(flight_item)
                     flight_item.depart_date = datetime.strftime(flight_item.depart_date, "%Y-%m-%d")
                     flight_item.return_date = datetime.strftime(flight_item.return_date, "%Y-%m-%d")
-            for key in dict:
-                general.update_json_files(flights=dict[key], year_month_date_depart=key, destination=destination_flight)
+            for key in flights_per_year_month_dict:
+                general.update_json_files(flights=flights_per_year_month_dict[key],
+                                          year_month_date_depart=key, destination=destination_flight)
 
 
 def alter_price(flights):
@@ -92,7 +93,8 @@ def fetch_data():
             t_progress_bar_destination.refresh()
             data["flightList"][0]["arrivalStation"] = destination
             data["flightList"][1]["departureStation"] = destination
-            response = requests.post(data_manager.Wizzair_whole_month_request, headers=data_manager.Wizzair_headers, data=json.dumps(data))
+            response = requests.post(data_manager.Wizzair_whole_month_request,
+                                     headers=data_manager.Wizzair_headers, data=json.dumps(data))
             if response.status_code == 200:
                 data_list.append(alter_price(response.json()["outboundFlights"]))
                 data_list.append(alter_price(response.json()["returnFlights"]))

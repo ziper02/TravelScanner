@@ -1,11 +1,4 @@
-from datetime import datetime
-import json,os
-from Entity.Airport import Airport
-import moderator as mod
-from Flights.Utilities import general as flight_general
-from Trip import Trip
-
-
+import general as flight_general
 
 # flights_data=flight_general.get_all_updated_data()
 #

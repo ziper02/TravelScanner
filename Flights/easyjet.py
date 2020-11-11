@@ -9,19 +9,13 @@ import moderator
 from data_manager import data_manager
 from Entity.Airport import Airport
 from Entity.Flight import Flight
-from Utilities import general
-
-whole_month_url = data_manager.Easyjet_whole_month_request
-
-currency_url = data_manager.currency_conversion.format(src='EUR', dest='ILS')
-request_currency = requests.get(url=currency_url)
-exchange_rate = request_currency.json()['EUR_ILS']
+from Flights import general
 
 
 def export_whole_months_all_dest():
     """
     Fetch data from Easyjet.com for all the detentions from TLV,
-    and save the data as json in Data\Flights folder.
+    and save the data as json in Data\\Flights folder.
     """
     depart_list = [Airport(code=o) for o in moderator.depart_list]
     destination_list = [Airport(code=o) for o in moderator.destination_list_easyjet]
@@ -42,6 +36,10 @@ def export_whole_months(depart=None, destination=None):
     :param destination: The destination of the flight
     :type destination: Airport
     """
+    whole_month_url = data_manager.Easyjet_whole_month_request
+    currency_url = data_manager.currency_conversion.format(src='EUR', dest='ILS')
+    request_currency = requests.get(url=currency_url)
+    exchange_rate = request_currency.json()['EUR_ILS']
     date_str = datetime.today().strftime('%Y-%m-%d')
     request_whole_month_url = whole_month_url.format(depart=depart.code, destination=destination.code,
                                                      depart_date=date_str)

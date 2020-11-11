@@ -10,18 +10,18 @@ from Entity.Airport import Airport
 from Entity.Flight import Flight
 from tqdm import tqdm
 
-from Utilities import general
+from Flights import general
 
 
 def export_whole_month_all_dest():
     """
     Fetch data from SkyScanner.com for all the detentions from TLV,
-    and save the data as json in Data\Flights folder.
+    and save the data as json in Data\\Flights folder.
     """
     date_selected = datetime.today()
     dates = []
-    depart_list=[Airport(code=o) for o in moderator.depart_list]
-    destination_list=[Airport(code=o) for o in moderator.destination_list_skyscanner]
+    depart_list = [Airport(code=o) for o in moderator.depart_list]
+    destination_list = [Airport(code=o) for o in moderator.destination_list_skyscanner]
     for i in range(11):
         dates.append(date_selected)
         date_selected = date_selected + relativedelta(months=1)
@@ -29,7 +29,8 @@ def export_whole_month_all_dest():
     for date in t_progress_bar_destination:
         for depart in depart_list:
             for destination in destination_list:
-                t_progress_bar_destination.set_description("SkyScanner " + date.strftime('%Y-%m')+ " "+ destination.name)
+                t_progress_bar_destination.set_description(
+                    "SkyScanner " + date.strftime('%Y-%m') + " " + destination.name)
                 t_progress_bar_destination.refresh()
                 export_whole_month(depart=depart, destination=destination, date=date)
                 time.sleep(0.6)
@@ -46,12 +47,17 @@ def export_whole_month(depart=None, destination=None, date=None):
     :type date: datetime
     """
     selected_month = date.strftime('%Y-%m')
-    Path(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month).mkdir(parents=True, exist_ok=True)
-    Path(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month + '/' + destination.name).mkdir(
+    Path(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month).mkdir(parents=True,
+                                                                                                exist_ok=True)
+    Path(
+        os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month + '/' + destination.name).mkdir(
         parents=True, exist_ok=True)
-    request_whole_month_url = data_manager.SkyScanner_whole_month_request.format(depart=depart.code, destination=destination.code,
-                                                     selected_month=selected_month)
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'}
+    request_whole_month_url = data_manager.SkyScanner_whole_month_request.format(depart=depart.code,
+                                                                                 destination=destination.code,
+                                                                                 selected_month=selected_month)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                      'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'}
     request = requests.get(url=request_whole_month_url, headers=headers)
     data_hash = request.json()
     data = data_hash["PriceGrids"]["Grid"]
@@ -67,10 +73,8 @@ def export_whole_month(depart=None, destination=None, date=None):
                 depart_date = selected_month + '-' + day_depart
                 return_date = selected_month + '-' + day_return
                 flight = Flight(departure=depart, destination=destination, depart_date=depart_date,
-                                return_date=return_date, price=price,source="SkyScanner")
+                                return_date=return_date, price=price, source="SkyScanner")
                 flights.append(flight)
             j = j + 1
         i = i + 1
     general.update_json_files(flights=flights, year_month_date_depart=selected_month, destination=destination)
-
-

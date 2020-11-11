@@ -14,7 +14,7 @@ class data_manager:
     Wizzair_whole_month_request = _data["Wizzair whole month request"]
     Wizzair_data_structure = _data["Wizzair data structure"]
     booking_order_address = _data["Booking order address"]
-    booking_headers = _data["Booking order address"]
+    booking_headers = _data["Booking headers"]
     with open(os.path.dirname(__file__)+'\monthDict.json') as f:
         month_dict = json.load(f)
 

@@ -7,9 +7,9 @@ import re
 import moderator
 from Entity.Airport import Airport
 from Entity.Flight import Flight
-from Utilities import skyscanner as ss
-from Utilities import easyjet as ej
-from Utilities import wizzair as wz
+import skyscanner as ss
+import easyjet as ej
+import wizzair as wz
 
 
 def fetch_data():
@@ -38,7 +38,7 @@ def update_json_files(flights, year_month_date_depart, destination):
             parents=True,
             exist_ok=True)
         Path(os.path.dirname(
-            __file__) + '/../../Data/Flights/Whole Month/' + year_month_date_depart + '/' + dest_all_for_name.name)\
+            __file__) + '/../../Data/Flights/Whole Month/' + year_month_date_depart + '/' + dest_all_for_name.name) \
             .mkdir(parents=True, exist_ok=True)
         my_file = Path(
             os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + year_month_date_depart + '/' +
@@ -63,7 +63,7 @@ def update_json_files(flights, year_month_date_depart, destination):
                   encoding='utf-8') as f:
             append_data = json.load(f)
         json_str = '/Data/Flights/Whole Month/' + year_month_date_depart + '/' + \
-                   dest_all_for_name.name + '/' + file_name + ' ' + dest_all_for_name.name + ' '\
+                   dest_all_for_name.name + '/' + file_name + ' ' + dest_all_for_name.name + ' ' \
                    + year_month_date_depart + '.json'
         append_data.append(json_str)
         append_data = list(set(append_data))
@@ -87,9 +87,9 @@ def add_to_json_dict(json_file):
         json_files_dict = json.load(f)
         if len(json_files_dict) == 0:
             json_files_dict = defaultdict(list)
-        lst=get_list_of_all_destinations()
+        lst = get_list_of_all_destinations()
         for dest in lst:
-            name=dest.name
+            name = dest.name
             if name in json_file:
                 if name in dict:
                     json_files_dict[name].append(json_file)
@@ -136,7 +136,7 @@ def get_files_list_of_location(name):
     """
     with open(os.path.dirname(__file__) +
               '/../../Data/Flights/json_files_dict.json', 'r') as f:
-        dict = json.load(f)
+        json_files_dict = json.load(f)
     with open(os.path.dirname(__file__) +
               '/../../Data/Flights/airports_countries.json', 'r') as f2:
         shortcut_dict = json.load(f2)
@@ -144,7 +144,7 @@ def get_files_list_of_location(name):
         fullname_airport = shortcut_dict[moderator.transfer_airport_cod_names_to_all(name)]['airportName']
     else:
         return
-    return dict[fullname_airport]
+    return json_files_dict[fullname_airport]
 
 
 def get_updated_data_by_name(name):
@@ -155,7 +155,7 @@ def get_updated_data_by_name(name):
     :return: list of updated flights of destination
     :rtype: list(flight)
     """
-    files_lst=get_files_list_of_location(name)
+    files_lst = get_files_list_of_location(name)
     today_date = datetime.today().strftime('%Y-%m-%d')
     updated_data_lst = [item for item in files_lst if today_date in item]
     flights_data = []
@@ -234,7 +234,6 @@ def label_all_flights_by_price_range():
                         flight.label = 1
                 flight.data_set = "Train"
         update_json_dest_by_list(flight_data=flights_data)
-
 
 
 def get_list_of_all_destinations():
