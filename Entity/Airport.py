@@ -1,62 +1,78 @@
 import json
 import os
-
 from Entity.Country import Country
 
 
 class Airport:
+    """
 
-    def __init__(self, code='', **dict):
+    Attributes:
+        name        The full name of airport
+        code        Shortcut name of airport
+        city        Airport's city, where the airport located
+        country     Airport's country,where the airport located
+    """
+    __code: str
+    __name: str
+    __city: str
+    __country: Country
+
+    def __init__(self, code: str = '', **json_text):
         if code != '':
-            self._code = code
+            self.__code = code
             self.__config_attributes()
         else:
-            self.__dict__.update(dict["dict"])
-            self._country = Country(dict=dict["dict"]["_country"])
+            self.__dict__.update(json_text["dict"])
+            self.__country = Country(dict=json_text["dict"]["__country"])
+
+    def __config_attributes(self, code=None):
+        """
+        initialize the details of airports according to his shortcut name(code)
+        from local data
+        :param code:shortcut name of airports
+        :type code: str
+        """
+        if code is not None:
+            code = self.__code
+            with open(os.path.dirname(__file__) + '/../Data/Flights/airports_countries.json') as f:
+                data = json.load(f)
+                self.__name = data[code]["airportName"]
+                self.__country = Country(name=data[code]["countryName"],
+                                         code=data[code]["countryCode"])
+                try:
+                    self.__city = data[code]["city"]
+                except Exception:
+                    self.__city = ''
 
     @property
-    def name(self):
-        return self._name
-
+    def name(self) -> str:
+        return self.__name
 
     @property
-    def code(self):
-        return self._code
+    def code(self) -> str:
+        return self.__code
 
     @code.setter
-    def code(self, value):
-        self._code = value
+    def code(self, value: str):
+        self.__code = value
         self.__config_attributes()
 
     @property
-    def city(self):
-        return self._city
+    def city(self) -> str:
+        return self.__city
 
     @property
-    def country(self):
-        return self._country
-
-    def __eq__(self, other):
-        if isinstance(other, Airport):
-            return self.code == other.name and self.code == other.name and self.country == other.country  and self._city == other._city
-        return False
+    def country(self) -> Country:
+        return self.__country
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __str__(self):
-        return 'Airport:: name: ' + self.name + ' code: ' + self.code + ' city: '+ self.city + '\n' + str(self.country)
+        return 'Airport:: name: ' + self.name + ' code: ' + self.code + ' city: ' + self.city + '\n' + str(self.country)
 
-    def __config_attributes(self, code=None):
-        if code == None:
-            code = self._code
-        with open(os.path.dirname(__file__) + '/../Data/Flights/airports_countries.json') as f:
-            data = json.load(f)
-            tessss=data[code]
-            self._name = data[code]["airportName"]
-            self._country = Country(name=data[code]["countryName"],
-                                    code=data[code]["countryCode"])
-            try:
-                self._city=data[code]["city"]
-            except:
-                self._city=''
+    def __eq__(self, other):
+        if isinstance(other, Airport):
+            return self.code == other.name and self.code == other.name and \
+                   self.country == other.country and self.__city == other.__city
+        return False

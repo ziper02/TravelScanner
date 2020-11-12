@@ -5,7 +5,7 @@ from pathlib import Path
 import requests
 from dateutil.relativedelta import relativedelta
 import moderator
-from data_manager import data_manager
+from DataManager import DataManager
 from Entity.Airport import Airport
 from Entity.Flight import Flight
 from tqdm import tqdm
@@ -52,9 +52,9 @@ def export_whole_month(depart=None, destination=None, date=None):
     Path(
         os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month + '/' + destination.name).mkdir(
         parents=True, exist_ok=True)
-    request_whole_month_url = data_manager.SkyScanner_whole_month_request.format(depart=depart.code,
-                                                                                 destination=destination.code,
-                                                                                 selected_month=selected_month)
+    request_whole_month_url = DataManager.SkyScanner_whole_month_request.format(depart=depart.code,
+                                                                                destination=destination.code,
+                                                                                selected_month=selected_month)
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                       'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'}

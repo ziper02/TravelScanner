@@ -1,12 +1,12 @@
 import time
 from datetime import datetime
-from Data import data_manager
+from Data import DataManager
 
 import requests
 from dateutil.relativedelta import relativedelta
 from tqdm import tqdm
 import moderator
-from data_manager import data_manager
+from DataManager import DataManager
 from Entity.Airport import Airport
 from Entity.Flight import Flight
 from Flights import general
@@ -36,8 +36,8 @@ def export_whole_months(depart=None, destination=None):
     :param destination: The destination of the flight
     :type destination: Airport
     """
-    whole_month_url = data_manager.Easyjet_whole_month_request
-    currency_url = data_manager.currency_conversion.format(src='EUR', dest='ILS')
+    whole_month_url = DataManager.Easyjet_whole_month_request
+    currency_url = DataManager.currency_conversion.format(src='EUR', dest='ILS')
     request_currency = requests.get(url=currency_url)
     exchange_rate = request_currency.json()['EUR_ILS']
     date_str = datetime.today().strftime('%Y-%m-%d')
@@ -79,7 +79,7 @@ def export_whole_months(depart=None, destination=None):
                 for potential_day_return in potential_days_return_list:
                     day_return = int(potential_day_return.strftime("%d")) - 1
 
-                    month_return_str = data_manager.data_manager.month_dict[potential_day_return.strftime("%m")]
+                    month_return_str = DataManager.DataManager.month_dict[potential_day_return.strftime("%m")]
                     month_return = 0
                     for return_temp in data_return:
                         if return_temp['monthDisplayName'] == month_return_str:

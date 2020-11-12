@@ -4,7 +4,7 @@ import platform
 import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-from data_manager import data_manager
+from DataManager import DataManager
 
 offical_group=0##enter the channel ID for get notifcations of bot
 log_group=1##enter channel ID for getting log of bot
@@ -15,7 +15,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
-url="https://api.telegram.org/bot"+data_manager.TravelScanner_bot+"/"
+url="https://api.telegram.org/bot" + DataManager.TravelScanner_bot + "/"
 
 
 
@@ -99,7 +99,7 @@ def error(update, context):
 def start_bot():
     """Start the bot."""
     # Create the Updater
-    updater = Updater(data_manager.TravelScanner_bot, use_context=True)
+    updater = Updater(DataManager.TravelScanner_bot, use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher

@@ -4,7 +4,7 @@ import os
 import calendar
 from datetime import datetime
 
-from data_manager import data_manager
+from DataManager import DataManager
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler
 
@@ -130,7 +130,7 @@ def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater(data_manager.Label_bot, use_context=True)
+    updater = Updater(DataManager.Label_bot, use_context=True)
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],

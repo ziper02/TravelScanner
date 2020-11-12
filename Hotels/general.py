@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime
 from threading import Semaphore, Thread
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 import fetch_utility
@@ -25,37 +25,15 @@ def get_data_by_name(trip, fetch_date=datetime.today().strftime('%Y-%m-%d')):
     start_date_dt = datetime.strptime(trip.start_date, '%Y-%m-%d')
     with open(os.path.dirname(__file__) + '/../Data/Hotels/Order Data/{selected_month}'
                                           '/{location}/{start_date}_{end_date}.json'.format(
-                                            selected_month=datetime.strftime(start_date_dt, "%Y-%m"),
-                                            location=trip.destination, start_date=trip.start_date,
-                                            end_date=trip.end_date), 'r') as f:
+            selected_month=datetime.strftime(start_date_dt, "%Y-%m"),
+            location=trip.destination, start_date=trip.start_date,
+            end_date=trip.end_date), 'r') as f:
         hotels_data = json.load(f)
     hotels = []
     for hotel_key, hotel_val in hotels_data.items():
         if hotels_data[hotel_key]['_fetch_date'] == fetch_date:
             hotels.append(Hotel(**hotels_data[hotel_key]))
     return hotels
-
-
-def filter_by_location(hotels_data, score):
-    """
-    filter the list by location's score
-    :param hotels_data: list of hotels that need to filter
-    :type hotels_data: list(Hotels)
-    :param score: the minimum location's score of new list
-    :type score: int
-    """
-    hotels_data = [hotel for hotel in hotels_data if float(hotel.location) >= score]
-
-
-def filter_by_score(hotels_data, score):
-    """
-    filter the list by general score
-    :param hotels_data: list of hotels that need to filter
-    :type hotels_data: list(Hotels)
-    :param score: the minimum general score of new list
-    :type score: int
-    """
-    hotels_data = [hotel for hotel in hotels_data if float(hotel.score) >= score]
 
 
 def update_data_hotels(destination='all', by_technique=ByTechnique.selenium, multi_thread=None):
@@ -106,7 +84,7 @@ def get_data_of_location_hotel_in_dates(trip, by_technique=ByTechnique.selenium)
     driver = None
     try:
         driver = fetch_utility.prepare_driver_chrome('https://www.booking.com')  # lunch driver to Booking
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'ss')))
+        WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.ID, 'ss')))
         fetch_utility.fill_form_with_dates(driver, trip)
         accommodations_data = fetch_utility.fetch_data_for_trip(driver, req_result, trip,
                                                                 by_technique)  # get the data from driver

@@ -1,163 +1,149 @@
-class Hotel():
+import copy
 
-    def __init__(self,name='',city='',value_for_money=-1,staff=-1,facilities=-1
-                 ,location=-1,free_wifi=-1,cleanliness=-1,score=-1
-                 ,popular_facilities=-1,comfort=-1,link=-1,address='',price=-1,check_in='',check_out='',**dict):
-        if city!='':
-            self._name=name
-            self._city=city
-            self._value_for_money=value_for_money
-            self._staff=staff
-            self._facilities=facilities
-            self._location=location
-            self._free_wifi=free_wifi
-            self._cleanliness=cleanliness
-            self._score=score
-            self._popular_facilities=popular_facilities
-            self._comfort=comfort
-            self._link=link
-            self._address=address
-            self._price = price
-            self._check_in=check_in
-            self._check_out=check_out
+
+class Hotel:
+    """
+
+    Attributes:
+        name                    The full name of  hotel
+        city                    The city that hotel located
+        price                   Total price for 2 adults for one room
+        score                   The general score for this hotel by users
+        location                The location score for this hotel by users
+        address                 The address of hotel
+        staff                   The staff score for this hotel by users
+        popular_facilities      Which facilities this hotel offer
+        facilities              The facilities score for this hotel by users
+        value_for_money         The value for money score for this hotel by users
+        free_wifi               The wifi score for this hotel by users
+        cleanliness             The cleanliness score for this hotel by users
+        comfort                 The comfort score for this hotel by users
+        link                    Url of Booking.com for this site
+    """
+    __name: str
+    __city: str
+    __price: int
+    __score: int
+    __location: int
+    __address: str
+    __staff: int
+    __popular_facilities: list
+    __facilities: int
+    __value_for_money: int
+    __free_wifi: int
+    __cleanliness: int
+    __comfort: int
+    __link: str
+
+    def __init__(self, name: str = '', city: str = '', value_for_money: int = -1, staff: int = -1, facilities: int = -1,
+                 location: int = -1, free_wifi: int = -1, cleanliness: int = -1, score: int = -1,
+                 popular_facilities: list = [],
+                 comfort: int = -1, link: str = '', address: str = '', price: int = -1, check_in: str = '',
+                 check_out: str = '', **json_text):
+        if city != '':
+            self.__name = name
+            self.__city = city
+            self.__value_for_money = value_for_money
+            self.__staff = staff
+            self.__facilities = facilities
+            self.__location = location
+            self.__free_wifi = free_wifi
+            self.__cleanliness = cleanliness
+            self.__score = score
+            self.__popular_facilities = copy.copy(popular_facilities)
+            self.__comfort = comfort
+            self.__link = link
+            self.__address = address
+            self.__price = price
+            self.__check_in = check_in
+            self.__check_out = check_out
         else:
-            self.__dict__.update(dict)
+            self.__dict__.update(json_text)
 
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, value):
-        self._name=value
-
-    @property
-    def check_in(self):
-        return self._check_in
-
-    @check_in.setter
-    def check_in(self, value):
-        self._check_in=value
+    def pretty_print(self):
+        """
+        :return: catchy phrase of hotel's information
+        :rtype: str
+        """
+        return "name: " + str(self.__name) + " city: " + str(self.__city) + "\nscore: " \
+               + str(self.__score) + " location: " + str(self.__location) + " price: " \
+               + str(self.__price)
 
     @property
-    def check_out(self):
-        return self._check_out
-
-    @check_out.setter
-    def check_out(self, value):
-        self._check_out=value
+    def name(self) -> str:
+        return self.__name
 
     @property
-    def city(self):
-        return self._city
-
-    @city.setter
-    def city(self, value):
-        self._city=value
+    def check_in(self) -> str:
+        return self.__check_in
 
     @property
-    def value_for_money(self):
-        return self._value_for_money
-
-    @value_for_money.setter
-    def value_for_money(self, value):
-        self._value_for_money=value
+    def address(self) -> str:
+        return self.__address
 
     @property
-    def staff(self):
-        return self._staff
-
-    @staff.setter
-    def staff(self, value):
-        self._staff = value
+    def check_out(self) -> str:
+        return self.__check_out
 
     @property
-    def facilities(self):
-        return self._facilities
-
-    @facilities.setter
-    def facilities(self, value):
-        self._facilities = value
+    def city(self) -> str:
+        return self.__city
 
     @property
-    def location(self):
-        return self._location
-
-    @location.setter
-    def location(self, value):
-        self._location = value
+    def value_for_money(self) -> int:
+        return self.__value_for_money
 
     @property
-    def free_wifi(self):
-        return self._free_wifi
-
-    @free_wifi.setter
-    def free_wifi(self, value):
-        self._free_wifi = value
+    def staff(self) -> int:
+        return self.__staff
 
     @property
-    def cleanliness(self):
-        return self._cleanliness
-
-    @cleanliness.setter
-    def cleanliness(self, value):
-        self._cleanliness = value
+    def facilities(self) -> int:
+        return self.__facilities
 
     @property
-    def score(self):
-        return self._score
-
-    @score.setter
-    def score(self, value):
-        self._score = value
+    def location(self) -> int:
+        return self.__location
 
     @property
-    def popular_facilities(self):
-        return self._popular_facilities
-
-    @popular_facilities.setter
-    def popular_facilities(self, value):
-        self._popular_facilities = value
+    def free_wifi(self) -> int:
+        return self.__free_wifi
 
     @property
-    def comfort(self):
-        return self._comfort
-
-    @comfort.setter
-    def comfort(self, value):
-        self._comfort = value
+    def cleanliness(self) -> int:
+        return self.__cleanliness
 
     @property
-    def link(self):
-        return self._link
-
-    @link.setter
-    def link(self, value):
-        self._link = value
+    def score(self) -> int:
+        return self.__score
 
     @property
-    def price(self):
-        return self._price
+    def popular_facilities(self) -> list:
+        return self.__popular_facilities
 
-    @price.setter
-    def price(self, value):
-        self._price = value
+    @property
+    def comfort(self) -> int:
+        return self.__comfort
+
+    @property
+    def link(self) -> str:
+        return self.__link
+
+    @property
+    def price(self) -> int:
+        return self.__price
+
+    def __str__(self):
+        return "Hotel:: name: " + self.__name + " city: " + self.__city + " score: " + str(self.__score) \
+               + " location: " + str(self.__location) + " price: " + str(self.__price) + "\nvalue for money: " \
+               + str(self.__value_for_money) + " staff: " + str(self.__staff) + " location: " + str(self.__location) \
+               + " free wifi: " + str(self.__free_wifi) + "\ncleanliness: " + str(self.__cleanliness) + " comfort: " \
+               + str(self.__comfort) + " link: " + str(self.__link) + " address: " + self.__address
 
     def __eq__(self, other):
         if isinstance(other, Hotel):
-            return self.name == other.name and self._city == other._city
+            return self.name == other.name and self.__city == other.__city
         return False
 
     def __ne__(self, other):
         return not self.__eq__(other)
-
-    def __str__(self):
-        return "Hotel:: name: "+self._name+" city: "+self._city+" score: "+self._score+" location: "\
-               +self._location+" price: "+self._price+"\nvalue for money: "+self._value_for_money+" staff: "+self._staff\
-               +" location: "+self._location+" free wifi: "+self._free_wifi+"\ncleanliness: "+self._cleanliness\
-               +" comfort: "+self._comfort+" link: "+self._link+" address: "+self._address
-
-    def pretty_print(self):
-        return "name: " + self._name + " city: " + self._city + "\nscore: " + self._score + " location: " \
-               + self._location + " price: " + str(self._price)

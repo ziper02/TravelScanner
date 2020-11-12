@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 import fetch_utility
 import requests
-from data_manager import data_manager
+from DataManager import DataManager
 
 
 def scrape_accommodation_data(accommodation_url, trip, location_dict):
@@ -19,9 +19,9 @@ def scrape_accommodation_data(accommodation_url, trip, location_dict):
     :return:Hotel with all his data including prices between the dates
     :rtype: dict()
     """
-    request_url = accommodation_url.replace('.html', '.en-gb.html') + data_manager.booking_order_address.format(
+    request_url = accommodation_url.replace('.html', '.en-gb.html') + DataManager.booking_order_address.format(
         start_date=trip.start_date, end_date=trip.end_date)
-    request = requests.get(url=request_url, headers=data_manager.booking_headers)
+    request = requests.get(url=request_url, headers=DataManager.booking_headers)
     page = request.text
     html_page = re.split(page, '\n')
     key = None
@@ -59,7 +59,7 @@ def scrape_accommodation_data_without_price(page='', accommodation_url='', need_
     if need_fetch:
         request_url = accommodation_url.replace('.html', '.en-gb.html')
         try:
-            request = requests.get(url=request_url, headers=data_manager.booking_headers)
+            request = requests.get(url=request_url, headers=DataManager.booking_headers)
         except Exception:
             return None
         page = request.text
@@ -138,9 +138,9 @@ def scrape_accommodation_data_only_price_and_update_dates(accommodation_fields, 
     accommodation_fields['_check_out'] = trip.end_date
     try:
         if make_get_request:
-            request_url = page.replace('.html', '.en-gb.html') + data_manager.booking_order_address.format(
+            request_url = page.replace('.html', '.en-gb.html') + DataManager.booking_order_address.format(
                 start_date=trip.start_date, end_date=trip.end_date)
-            request = requests.get(url=request_url, headers=data_manager.booking_headers)
+            request = requests.get(url=request_url, headers=DataManager.booking_headers)
             page = request.text
         m = re.search(r'"b_price":"₪\s*([^\n$"]+)', page)
         price = int(m.group(1).replace(',', ''))
