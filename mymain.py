@@ -1,4 +1,3 @@
-import general as flight_general
 
 # flights_data=flight_general.get_all_updated_data()
 #
@@ -17,4 +16,19 @@ import general as flight_general
 #     print(trip.pretty_print())
 #
 
-flight_general.get_updated_data_by_name('AMS')
+from Entity.Flight import Flight
+from Flights import general
+from Entity.Hotel import Hotel
+import os,json
+
+
+with open(os.path.dirname(__file__)+"/Data/Hotels/Locations Data/Berlin.json",'r',encoding='utf-8') as f:
+    data:dict=json.load(f)
+
+hotels_data=[]
+for temp in data.keys():
+    dict_hotel=data[temp]
+    hotels_data.append(Hotel(**dict_hotel))
+
+with open(os.path.dirname(__file__)+"/Data/test.json",'w',encoding='utf-8') as f:
+    json.dump(hotels_data,f,default=general.obj_dict,indent=4)

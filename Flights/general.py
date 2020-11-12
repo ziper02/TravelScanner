@@ -74,7 +74,7 @@ def update_json_files(flights, year_month_date_depart, destination):
 
 
 def obj_dict(obj):
-    return obj.__dict__
+    return obj.to_json()
 
 
 def add_to_json_dict(json_file):

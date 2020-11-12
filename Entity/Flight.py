@@ -35,7 +35,7 @@ class Flight:
 
     def __init__(self, departure: Airport = None, destination: Airport = None, depart_date: str = '',
                  return_date: str = '', price: int = -1,
-                 source: str = 'unknown', label: int = -1, data_set: str = 'unknown', **json_text):
+                 source: str = 'unknown', label: int = -1, data_set: str = 'unknown', **json_text: dict):
         if departure is not None:
             self.__departure = departure
             self.__destination = destination
@@ -49,9 +49,19 @@ class Flight:
             self.__destination_value = -1
             self.__days = -1
         else:
-            self.__dict__.update(json_text)
-            self.__destination = Airport(json_text=json_text["__destination"])
-            self.__departure = Airport(json_text=json_text["__departure"])
+            try:
+                json_text = json_text["json_text"]
+            except Exception:
+                pass
+            self.__depart_date = str(json_text["depart date"])
+            self.__return_date = str(json_text["return date"])
+            self.__price = json_text["price"]
+            self.__label = json_text["label"]
+            self.__source = str(json_text["source"])
+            self.__data_set = str(json_text["data set"])
+            self.__destination = Airport(**json_text.pop("destination"))
+            self.__departure = Airport(**json_text.pop("departure"))
+
             with open(os.path.dirname(__file__) + "/../Data/Flights/dict_rate_dest.json", 'r', encoding="utf-8") as f:
                 rate_dest = json.load(f)
             self.__destination_value = rate_dest[self.__destination.code]
@@ -66,6 +76,22 @@ class Flight:
         return "\ndestination:  " + str(self.__destination.name) + " " + str(self.__destination.country.name) + \
                "\ndepart date:  " + str(self.__depart_date) + " return date:  " + str(self.__return_date) + \
                "\nprice:  " + str(self.__price)
+
+    def to_json(self):
+        """
+        :return dictionary with all attributes
+        :rtype: dict
+        """
+        return {
+            "destination": self.__destination.to_json(),
+            "departure": self.__departure.to_json(),
+            "depart date": self.__depart_date,
+            "return date": self.__return_date,
+            "price": self.__price,
+            "label": self.__label,
+            "source": self.__source,
+            "data set": self.__data_set
+        }
 
     @property
     def departure(self) -> Airport:

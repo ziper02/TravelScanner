@@ -8,12 +8,27 @@ class Country:
     __name: str
     __code: str
 
-    def __init__(self, name: str = '', code: str = '', **json_text):
+    def __init__(self, name: str = '', code: str = '', **json_text: dict):
         if name != '':
             self.__name = name
             self.__code = code
         else:
-            self.__dict__.update(json_text["dict"])
+            try:
+                json_text = json_text["dict"]
+            except Exception:
+                pass
+            self.__code = str(json_text["code"])
+            self.__name = str(json_text["name"])
+
+    def to_json(self):
+        """
+        :return dictionary with all attributes
+        :rtype: dict
+        """
+        return {
+            "code": self.__code,
+            "name": self.__name
+        }
 
     @property
     def name(self) -> str:

@@ -22,43 +22,91 @@ class Hotel:
     """
     __name: str
     __city: str
-    __price: int
-    __score: int
-    __location: int
+    __price: float
+    __score: float
+    __location: float
     __address: str
-    __staff: int
+    __staff: float
     __popular_facilities: list
-    __facilities: int
-    __value_for_money: int
-    __free_wifi: int
-    __cleanliness: int
-    __comfort: int
+    __facilities: float
+    __value_for_money: float
+    __free_wifi: float
+    __cleanliness: float
+    __comfort: float
     __link: str
 
-    def __init__(self, name: str = '', city: str = '', value_for_money: int = -1, staff: int = -1, facilities: int = -1,
-                 location: int = -1, free_wifi: int = -1, cleanliness: int = -1, score: int = -1,
-                 popular_facilities: list = [],
-                 comfort: int = -1, link: str = '', address: str = '', price: int = -1, check_in: str = '',
-                 check_out: str = '', **json_text):
-        if city != '':
-            self.__name = name
-            self.__city = city
+    def __init__(self, name_of_hotel: str = '', city_located: str = '', value_for_money: float = -1,
+                 staff_score: float = -1, facilities_score: float = -1,
+                 location_score: float = -1, free_wifi_score: float = -1, cleanliness_score: float = -1,
+                 general_score: float = -1,
+                 popular_facilities: list = None, comfort_score: float = -1, url: str = '', address_of_hotel: str = '',
+                 price_for_one_room: float = -1, check_in: str = '', check_out: str = '', **json_text: dict):
+        if city_located != '':
+            self.__name = name_of_hotel
+            self.__city = city_located
             self.__value_for_money = value_for_money
-            self.__staff = staff
-            self.__facilities = facilities
-            self.__location = location
-            self.__free_wifi = free_wifi
-            self.__cleanliness = cleanliness
-            self.__score = score
-            self.__popular_facilities = copy.copy(popular_facilities)
-            self.__comfort = comfort
-            self.__link = link
-            self.__address = address
-            self.__price = price
+            self.__staff = staff_score
+            self.__facilities = facilities_score
+            self.__location = location_score
+            self.__free_wifi = free_wifi_score
+            self.__cleanliness = cleanliness_score
+            self.__score = general_score
+            if popular_facilities is not None:
+                self.__popular_facilities = copy.copy(popular_facilities)
+            else:
+                self.__popular_facilities = []
+            self.__comfort = comfort_score
+            self.__link = url
+            self.__address = address_of_hotel
+            self.__price = price_for_one_room
             self.__check_in = check_in
             self.__check_out = check_out
         else:
-            self.__dict__.update(json_text)
+            self.__name = str(json_text["name"])
+            try:
+                self.__value_for_money = json_text["value for money"]
+            except Exception:
+                self.__value_for_money = -1
+            try:
+                self.__staff = json_text["staff"]
+            except Exception:
+                self.__staff = -1
+            try:
+                self.__facilities = json_text["facilities"]
+            except Exception:
+                self.__facilities = -1
+            try:
+                self.__location = json_text["location"]
+            except Exception:
+                self.__location = -1
+            try:
+                self.__free_wifi = json_text["free wifi"]
+            except Exception:
+                self.__free_wifi = -1
+            try:
+                self.__cleanliness = json_text["cleanliness"]
+            except Exception:
+                self.__cleanliness = -1
+            self.__score = json_text["score"]
+            try:
+                self.__comfort = json_text["comfort"]
+            except Exception:
+                self.__comfort = -1
+            self.__link = str(json_text["link"])
+            self.__address = str(json_text["address"])
+            self.__popular_facilities = list()
+            for item in json_text["popular facilities"]:
+                self.__popular_facilities.append(item)
+            if 'city' in json_text.keys():
+                self.__city = str(json_text["city"])
+                self.__check_in = str(json_text["check in"])
+                self.__check_out = str(json_text["check out"])
+                self.__price = json_text["price"]
+            else:
+                self.__city = ''
+                self.__check_in = ''
+                self.__check_out = ''
+                self.__price = -1
 
     def pretty_print(self):
         """
@@ -68,6 +116,34 @@ class Hotel:
         return "name: " + str(self.__name) + " city: " + str(self.__city) + "\nscore: " \
                + str(self.__score) + " location: " + str(self.__location) + " price: " \
                + str(self.__price)
+
+    def to_json(self):
+        """
+        :return dictionary with all attributes
+        :rtype: dict
+        """
+        dict_to_json = {
+            "name": self.__name,
+            "value for money": self.__value_for_money,
+            "staff": self.__staff,
+            "facilities": self.__facilities,
+            "location": self.__location,
+            "free wifi": self.__free_wifi,
+            "cleanliness": self.__cleanliness,
+            "score": self.__score,
+            "comfort": self.__comfort,
+            "link": self.__link,
+            "address": self.__address,
+            "popular facilities": []
+        }
+        for item in self.__popular_facilities:
+            dict_to_json["popular facilities"].append(item)
+        if self.__city != '':
+            dict_to_json["city"] = self.__city
+            dict_to_json["check in"] = self.__check_in
+            dict_to_json["check out"] = self.__check_out
+            dict_to_json["price"] = self.__price
+        return dict_to_json
 
     @property
     def name(self) -> str:
@@ -90,31 +166,31 @@ class Hotel:
         return self.__city
 
     @property
-    def value_for_money(self) -> int:
+    def value_for_money(self) -> float:
         return self.__value_for_money
 
     @property
-    def staff(self) -> int:
+    def staff(self) -> float:
         return self.__staff
 
     @property
-    def facilities(self) -> int:
+    def facilities(self) -> float:
         return self.__facilities
 
     @property
-    def location(self) -> int:
+    def location(self) -> float:
         return self.__location
 
     @property
-    def free_wifi(self) -> int:
+    def free_wifi(self) -> float:
         return self.__free_wifi
 
     @property
-    def cleanliness(self) -> int:
+    def cleanliness(self) -> float:
         return self.__cleanliness
 
     @property
-    def score(self) -> int:
+    def score(self) -> float:
         return self.__score
 
     @property
@@ -122,7 +198,7 @@ class Hotel:
         return self.__popular_facilities
 
     @property
-    def comfort(self) -> int:
+    def comfort(self) -> float:
         return self.__comfort
 
     @property
@@ -130,7 +206,7 @@ class Hotel:
         return self.__link
 
     @property
-    def price(self) -> int:
+    def price(self) -> float:
         return self.__price
 
     def __str__(self):

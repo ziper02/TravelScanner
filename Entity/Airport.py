@@ -1,5 +1,6 @@
 import json
 import os
+
 from Entity.Country import Country
 
 
@@ -17,13 +18,19 @@ class Airport:
     __city: str
     __country: Country
 
-    def __init__(self, code: str = '', **json_text):
+    def __init__(self, code: str = '', **json_text: dict):
         if code != '':
             self.__code = code
             self.__config_attributes()
         else:
-            self.__dict__.update(json_text["dict"])
-            self.__country = Country(dict=json_text["dict"]["__country"])
+            try:
+                json_text = json_text["json_text"]
+            except Exception:
+                pass
+            self.__code = str(json_text["code"])
+            self.__name = str(json_text["name"])
+            self.__city = str(json_text["city"])
+            self.__country = Country(**json_text.pop("country"))
 
     def __config_attributes(self, code=None):
         """
@@ -43,6 +50,18 @@ class Airport:
                     self.__city = data[code]["city"]
                 except Exception:
                     self.__city = ''
+
+    def to_json(self):
+        """
+        :return dictionary with all attributes
+        :rtype: dict
+        """
+        return {
+            "code": self.__code,
+            "name": self.__name,
+            "city": self.__city,
+            "country": self.__country.to_json()
+        }
 
     @property
     def name(self) -> str:
