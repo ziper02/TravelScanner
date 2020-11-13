@@ -115,7 +115,8 @@ def scrape_accommodation_data_without_price(page='', accommodation_url='', need_
                 count = count + 1
             if '<div class="bui-review-score c-score bui-review-score--end">' in line:
                 soup = BeautifulSoup(line, 'html.parser')
-                accommodation_fields['score'] = soup.find(class_="bui-review-score__badge").get_text().lstrip().rstrip()
+                accommodation_fields['score'] = float(soup.find(class_="bui-review-score__badge")
+                                                      .get_text().lstrip().rstrip())
         elif found:
             break
     return accommodation_fields
@@ -141,16 +142,17 @@ def scrape_accommodation_data_only_price_and_update_dates(accommodation_fields, 
     accommodation_fields['check in'] = trip.start_date
     accommodation_fields['check out'] = trip.end_date
     try:
-        if make_get_request:
+        if make_get_request:  # if need to send request for get price, its insert
+            # the price to page else use page from input
             request_url = page.replace('.html', '.en-gb.html') + DataManager.booking_order_address.format(
                 start_date=trip.start_date, end_date=trip.end_date)
             request = requests.get(url=request_url, headers=DataManager.booking_headers)
             page = request.text
         m = re.search(r'"b_price":"₪\s*([^\n$"]+)', page)
-        price = int(m.group(1).replace(',', ''))
+        price = float(m.group(1).replace(',', ''))
         can_order = True
     except Exception:
-        price = 'no available'
+        price = -1
         can_order = False
     accommodation_fields['fetch date'] = datetime.today().strftime('%Y-%m-%d')
     accommodation_fields['price'] = price

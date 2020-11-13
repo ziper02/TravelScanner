@@ -195,8 +195,8 @@ def update_data_per_location_hotels_without_dates(location_name, sem=None, by_te
             if url_data is not None:
                 new_accommodations_data.append(url_data)
         try:
-            new_accommodations_data = {item['_name']: item for item in new_accommodations_data if
-                                       '_name' in item.keys()}
+            new_accommodations_data = {item['name']: item for item in new_accommodations_data if
+                                       'name' in item.keys()}
         except Exception:
             print("ERROR new_accommodations_data in update_data_per_location_hotels_without_dates")
             return

@@ -102,14 +102,14 @@ def scrape_accommodation_data_only_price_and_update_dates(driver, accommodation_
     accommodation_fields['check in'] = trip.start_date
     accommodation_fields['check out'] = trip.end_date
     try:
-        temp_price = driver.find_element_by_class_name('bui-price-display__value').text
+        temp_price = float(driver.find_element_by_class_name('bui-price-display__value').text.replace(',', ''))
         can_order = True
     except Exception:
         try:
             return booking_requests.scrape_accommodation_data_only_price_and_update_dates(
                 accommodation_fields, trip, page=driver.current_url, make_get_request=True)
         except Exception:
-            temp_price = 'no available'
+            temp_price = -1
             can_order = False
     accommodation_fields['fetch date'] = datetime.today().strftime('%Y-%m-%d')
     accommodation_fields['price'] = temp_price

@@ -48,14 +48,14 @@ def update_data_hotels(destination='all', by_technique=ByTechnique.selenium, mul
     :type multi_thread: int
     """
     sem = None
-    if multi_thread is not None:
-        sem = Semaphore(multi_thread)
+    if multi_thread is not None and multi_thread>1:
+        sem = Semaphore(int(multi_thread))
     if destination == 'all':
         airports_list = flight_general.get_list_of_all_destinations()
         destinations = {airport.city for airport in airports_list}
         thread = None
         for location in destinations:
-            if multi_thread is not None:
+            if multi_thread is not None and multi_thread>1:
                 sem.acquire()
                 thread = Thread(target=fetch_utility.update_data_per_location_hotels_without_dates,
                                 args=(location, sem, by_technique))
