@@ -34,9 +34,9 @@ def export_whole_month_all_dest():
                         and flight_data["arrivalStation"] == depart_flight.code:
                     destination_depart_list.append(flight_data)
             for flight in depart_destination_list:
-                flight["departureDate"] = datetime.strptime(flight["departureDate"][0:10], '%Y-%m-%d')
+                flight["departureDate"] = flight["departureDate"][0:10]
             for flight in destination_depart_list:
-                flight["departureDate"] = datetime.strptime(flight["departureDate"][0:10], '%Y-%m-%d')
+                flight["departureDate"] = flight["departureDate"][0:10]
             combination_flights = []
             for item_depart in depart_destination_list:
                 for item_return in destination_depart_list:

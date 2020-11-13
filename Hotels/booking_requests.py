@@ -3,6 +3,7 @@ from datetime import datetime
 import fetch_utility
 import requests
 from DataManager import DataManager
+from bs4 import BeautifulSoup
 
 
 def scrape_accommodation_data(accommodation_url, trip, location_dict):
@@ -64,7 +65,7 @@ def scrape_accommodation_data_without_price(page='', accommodation_url='', need_
             return None
         page = request.text
     accommodation_fields = dict()
-    accommodation_fields['_link'] = accommodation_url
+    accommodation_fields['link'] = accommodation_url
     found = False
     count = 0
     html_page = page.splitlines()
@@ -83,8 +84,8 @@ def scrape_accommodation_data_without_price(page='', accommodation_url='', need_
                     temp = re.split('<', m[1])
                     title = temp[0]
                 temp = re.split('</span', m2[1])
-                score = temp[0]
-                title = "_" + title.lower().rstrip().replace(" ", "_")
+                score = float(temp[0])
+                title = title.lower().rstrip().lstrip()
                 accommodation_fields[title] = score
             if 'hp_address_subtitle' in line:
                 lst = []
@@ -93,14 +94,14 @@ def scrape_accommodation_data_without_price(page='', accommodation_url='', need_
                     i = i + 1
                     line = html_page[i]
                 address = lst[-1].rstrip()
-                accommodation_fields['_address'] = address
+                accommodation_fields['address'] = address
             if 'important_facility  "' in line:
                 i = i + 1
                 line = html_page[i]
-                if '_popular_facilities' not in accommodation_fields.keys():
-                    accommodation_fields['_popular_facilities'] = []
+                if 'popular facilities' not in accommodation_fields.keys():
+                    accommodation_fields['popular facilities'] = []
                 facility = re.findall('"([^"]*)"', line)[0]
-                accommodation_fields['_popular_facilities'].append(facility)
+                accommodation_fields['popular facilities'].append(facility)
             if 'id="hp_hotel_name"' in line:
                 lst = []
                 while '</h2>' not in line:
@@ -109,9 +110,12 @@ def scrape_accommodation_data_without_price(page='', accommodation_url='', need_
                     line = html_page[i]
                 pre = re.search(r'>(.*?)<', lst[-2]).group(1).replace('\n', ' ')
                 hotel_name = lst[-1].rstrip()
-                accommodation_fields['_name'] = pre + ' ' + hotel_name
+                accommodation_fields['name'] = pre + ' ' + hotel_name
             if found:
                 count = count + 1
+            if '<div class="bui-review-score c-score bui-review-score--end">' in line:
+                soup = BeautifulSoup(line, 'html.parser')
+                accommodation_fields['score'] = soup.find(class_="bui-review-score__badge").get_text().lstrip().rstrip()
         elif found:
             break
     return accommodation_fields
@@ -133,9 +137,9 @@ def scrape_accommodation_data_only_price_and_update_dates(accommodation_fields, 
     :return: dict{"hotel_name":data} of the specific hotel with price and dates and if hotel is available
     :rtype: dict,bool
     """
-    accommodation_fields['_city'] = trip.destination
-    accommodation_fields['_check_in'] = trip.start_date
-    accommodation_fields['_check_out'] = trip.end_date
+    accommodation_fields['city'] = trip.destination
+    accommodation_fields['check in'] = trip.start_date
+    accommodation_fields['check out'] = trip.end_date
     try:
         if make_get_request:
             request_url = page.replace('.html', '.en-gb.html') + DataManager.booking_order_address.format(
@@ -148,6 +152,6 @@ def scrape_accommodation_data_only_price_and_update_dates(accommodation_fields, 
     except Exception:
         price = 'no available'
         can_order = False
-    accommodation_fields['_fetch_date'] = datetime.today().strftime('%Y-%m-%d')
-    accommodation_fields['_price'] = price
+    accommodation_fields['fetch date'] = datetime.today().strftime('%Y-%m-%d')
+    accommodation_fields['price'] = price
     return accommodation_fields, can_order

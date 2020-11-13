@@ -36,11 +36,11 @@ class Hotel:
     __link: str
 
     def __init__(self, name_of_hotel: str = '', city_located: str = '', value_for_money: float = -1,
-                 staff_score: float = -1, facilities_score: float = -1,
-                 location_score: float = -1, free_wifi_score: float = -1, cleanliness_score: float = -1,
-                 general_score: float = -1,
+                 staff_score: float = -1, facilities_score: float = -1,  location_score: float = -1,
+                 free_wifi_score: float = -1, cleanliness_score: float = -1, general_score: float = -1,
                  popular_facilities: list = None, comfort_score: float = -1, url: str = '', address_of_hotel: str = '',
-                 price_for_one_room: float = -1, check_in: str = '', check_out: str = '', **json_text: dict):
+                 price_for_one_room: float = -1, check_in: str = '', check_out: str = '', fetch_date: str = '',
+                 **json_text: dict):
         if city_located != '':
             self.__name = name_of_hotel
             self.__city = city_located
@@ -61,7 +61,8 @@ class Hotel:
             self.__price = price_for_one_room
             self.__check_in = check_in
             self.__check_out = check_out
-        else:
+            self.__fetch_date = fetch_date
+        else:  # the data come as json
             self.__name = str(json_text["name"])
             try:
                 self.__value_for_money = json_text["value for money"]
@@ -102,20 +103,13 @@ class Hotel:
                 self.__check_in = str(json_text["check in"])
                 self.__check_out = str(json_text["check out"])
                 self.__price = json_text["price"]
+                self.__fetch_date = json_text["fetch date"]
             else:
                 self.__city = ''
                 self.__check_in = ''
                 self.__check_out = ''
                 self.__price = -1
-
-    def pretty_print(self):
-        """
-        :return: catchy phrase of hotel's information
-        :rtype: str
-        """
-        return "name: " + str(self.__name) + " city: " + str(self.__city) + "\nscore: " \
-               + str(self.__score) + " location: " + str(self.__location) + " price: " \
-               + str(self.__price)
+                self.__fetch_date = ''
 
     def to_json(self):
         """
@@ -143,6 +137,7 @@ class Hotel:
             dict_to_json["check in"] = self.__check_in
             dict_to_json["check out"] = self.__check_out
             dict_to_json["price"] = self.__price
+            dict_to_json["fetch date"] = self.__fetch_date
         return dict_to_json
 
     @property
@@ -160,6 +155,10 @@ class Hotel:
     @property
     def check_out(self) -> str:
         return self.__check_out
+
+    @property
+    def fetch_date(self) -> str:
+        return self.__fetch_date
 
     @property
     def city(self) -> str:
@@ -210,6 +209,11 @@ class Hotel:
         return self.__price
 
     def __str__(self):
+        return "name: " + str(self.__name) + " city: " + str(self.__city) + "\nscore: " \
+               + str(self.__score) + " location: " + str(self.__location) + " price: " \
+               + str(self.__price)
+
+    def __repr__(self):
         return "Hotel:: name: " + self.__name + " city: " + self.__city + " score: " + str(self.__score) \
                + " location: " + str(self.__location) + " price: " + str(self.__price) + "\nvalue for money: " \
                + str(self.__value_for_money) + " staff: " + str(self.__staff) + " location: " + str(self.__location) \

@@ -50,38 +50,38 @@ def scrape_accommodation_data_without_price(driver, accommodation_url, need_fetc
     accommodation_fields = dict()
     # Get the accommodation name
     try:
-        accommodation_fields['_name'] = driver.find_element_by_id('hp_hotel_name') \
+        accommodation_fields['name'] = driver.find_element_by_id('hp_hotel_name') \
             .text.strip('trip').replace('\n', ' ')
         # Get the accommodation score
     except Exception:
         return None
     try:
-        accommodation_fields['_score'] = driver.find_element_by_class_name(
+        accommodation_fields['score'] = float(driver.find_element_by_class_name(
             'bui-review-score--end').find_element_by_class_name(
-            'bui-review-score__badge').text
+            'bui-review-score__badge').text)
         try:
             all_box_grades = driver.find_element_by_class_name('v2_review-scores__body').find_elements_by_tag_name("li")
             driver.find_element_by_class_name('bui-review-score__title').click()
             for box_grade in all_box_grades:
                 temp_title_score = box_grade.find_element_by_class_name('c-score-bar__title').text
-                temp_grade_score = box_grade.find_element_by_class_name('c-score-bar__score').text
-                accommodation_fields["_" + temp_title_score.lower().rstrip().replace(" ", "_")] = temp_grade_score
+                temp_grade_score = float(box_grade.find_element_by_class_name('c-score-bar__score').text)
+                accommodation_fields[temp_title_score.lower().rstrip().lstrip()] = temp_grade_score
         except Exception:
-            accommodation_fields['_location'] = '0'
+            accommodation_fields['location'] = '0'
     except Exception:
-        accommodation_fields['_score'] = 'not enough reviews'
+        accommodation_fields['score'] = 'not enough reviews'
     # Get the accommodation location
-    accommodation_fields['_address'] = driver.find_element_by_id('showMap2') \
+    accommodation_fields['address'] = driver.find_element_by_id('showMap2') \
         .find_element_by_class_name('hp_address_subtitle').text
     # Get the most popular facilities
     try:
-        accommodation_fields['_popular_facilities'] = list()
+        accommodation_fields['popular facilities'] = list()
         facilities = driver.find_element_by_class_name('hp_desc_important_facilities')
         for facility in facilities.find_elements_by_class_name('important_facility'):
-            accommodation_fields['_popular_facilities'].append(facility.text)
+            accommodation_fields['popular facilities'].append(facility.text)
     except Exception:
-        accommodation_fields['_popular_facilities'].append('unknown')
-    accommodation_fields['_link'] = accommodation_url
+        accommodation_fields['popular facilities'].append('unknown')
+    accommodation_fields['link'] = accommodation_url
     return accommodation_fields
 
 
@@ -98,9 +98,9 @@ def scrape_accommodation_data_only_price_and_update_dates(driver, accommodation_
     :return: dict{"hotel_name":data} of the specific hotel with price and dates and if hotel is available
     :rtype: dict,bool
     """
-    accommodation_fields['_city'] = trip.destination
-    accommodation_fields['_check_in'] = trip.start_date
-    accommodation_fields['_check_out'] = trip.end_date
+    accommodation_fields['city'] = trip.destination
+    accommodation_fields['check in'] = trip.start_date
+    accommodation_fields['check out'] = trip.end_date
     try:
         temp_price = driver.find_element_by_class_name('bui-price-display__value').text
         can_order = True
@@ -111,6 +111,6 @@ def scrape_accommodation_data_only_price_and_update_dates(driver, accommodation_
         except Exception:
             temp_price = 'no available'
             can_order = False
-    accommodation_fields['_fetch_date'] = datetime.today().strftime('%Y-%m-%d')
-    accommodation_fields['_price'] = temp_price
+    accommodation_fields['fetch date'] = datetime.today().strftime('%Y-%m-%d')
+    accommodation_fields['price'] = temp_price
     return accommodation_fields, can_order

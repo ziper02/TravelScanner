@@ -61,21 +61,15 @@ class Flight:
             self.__data_set = str(json_text["data set"])
             self.__destination = Airport(**json_text.pop("destination"))
             self.__departure = Airport(**json_text.pop("departure"))
-
+        try:
             with open(os.path.dirname(__file__) + "/../Data/Flights/dict_rate_dest.json", 'r', encoding="utf-8") as f:
                 rate_dest = json.load(f)
             self.__destination_value = rate_dest[self.__destination.code]
-            self.__days = (datetime.strptime(self.return_date, '%Y-%m-%d') - datetime.strptime(self.depart_date,
-                                                                                               '%Y-%m-%d')).days
-
-    def pretty_print(self):
-        """
-        :return: catchy phrase of flight's information
-        :rtype: str
-        """
-        return "\ndestination:  " + str(self.__destination.name) + " " + str(self.__destination.country.name) + \
-               "\ndepart date:  " + str(self.__depart_date) + " return date:  " + str(self.__return_date) + \
-               "\nprice:  " + str(self.__price)
+        except Exception:
+            pass
+        if self.__depart_date != '' and self.__return_date != '':
+            self.__days = (datetime.strptime(self.__return_date, '%Y-%m-%d') - datetime.strptime(
+                self.__depart_date, '%Y-%m-%d')).days
 
     def to_json(self):
         """
@@ -138,6 +132,11 @@ class Flight:
     def data_set(self) -> str:
         return self.__data_set
 
+    def __str__(self):
+        return "\ndestination:  " + str(self.__destination.name) + " " + str(self.__destination.country.name) + \
+               "\ndepart date:  " + str(self.__depart_date) + " return date:  " + str(self.__return_date) + \
+               "\nprice:  " + str(self.__price)
+
     def __eq__(self, other):
         if isinstance(other, Flight):
             if self.__depart_date == other.__depart_date and self.__departure == other.__departure \
@@ -157,7 +156,7 @@ class Flight:
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def __str__(self):
+    def __repr__(self):
         return "Flight:: departure:  " + str(self.__departure) + "\ndestination:  " + str(self.__destination) + \
                "\ndepart date:  " + str(self.__depart_date) + " return date:  " + str(self.__return_date) + \
                "\nprice:  " + str(self.__price) + " label:  " + str(self.__label) + " data set:  " + str(

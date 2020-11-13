@@ -32,24 +32,20 @@ class Airport:
             self.__city = str(json_text["city"])
             self.__country = Country(**json_text.pop("country"))
 
-    def __config_attributes(self, code=None):
+    def __config_attributes(self):
         """
         initialize the details of airports according to his shortcut name(code)
         from local data
-        :param code:shortcut name of airports
-        :type code: str
         """
-        if code is not None:
-            code = self.__code
-            with open(os.path.dirname(__file__) + '/../Data/Flights/airports_countries.json') as f:
-                data = json.load(f)
-                self.__name = data[code]["airportName"]
-                self.__country = Country(name=data[code]["countryName"],
-                                         code=data[code]["countryCode"])
-                try:
-                    self.__city = data[code]["city"]
-                except Exception:
-                    self.__city = ''
+        with open(os.path.dirname(__file__) + '/../Data/Flights/airports_countries.json') as f:
+            data = json.load(f)
+            self.__name = data[self.__code]["airportName"]
+            self.__country = Country(name=data[self.__code]["countryName"],
+                                     code=data[self.__code]["countryCode"])
+            try:
+                self.__city = data[self.__code]["city"]
+            except Exception:
+                self.__city = ''
 
     def to_json(self):
         """

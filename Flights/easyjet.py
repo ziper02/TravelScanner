@@ -79,7 +79,7 @@ def export_whole_months(depart=None, destination=None):
                 for potential_day_return in potential_days_return_list:
                     day_return = int(potential_day_return.strftime("%d")) - 1
 
-                    month_return_str = DataManager.DataManager.month_dict[potential_day_return.strftime("%m")]
+                    month_return_str = DataManager.month_dict[potential_day_return.strftime("%m")]
                     month_return = 0
                     for return_temp in data_return:
                         if return_temp['monthDisplayName'] == month_return_str:

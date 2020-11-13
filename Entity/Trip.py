@@ -20,7 +20,7 @@ class Trip:
     __start_date: str
     __end_date: str
     __price: int
-    __alternative_hotels:list
+    __alternative_hotels: list
 
     def __init__(self, flight: Flight = None, start_date: str = '', end_date: str = '', hotel: Hotel = None,
                  price: int = -1):
@@ -54,14 +54,6 @@ class Trip:
         self.__hotel = hotels_data.pop(0)
         self.__alternative_hotels = hotels_data
 
-    def pretty_print(self):
-        """
-        :return: catchy phrase of trip's information
-        :rtype: str
-        """
-        return "Flight:" + self.__flight.pretty_print() + "\n" + "Hotel:\n" + self.__hotel.pretty_print() + \
-               "\n Total price: " + str(self.__price)
-
     @property
     def hotel(self) -> Hotel:
         return self.__hotel
@@ -90,5 +82,9 @@ class Trip:
     def destination(self) -> str:
         return self.__hotel.city
 
-    def __str__(self):
+    def __repr__(self):
         return "Flight:\n" + str(self.__flight) + "\n" + "Hotel:\n" + str(self.__hotel)
+
+    def __str__(self):
+        return "Flight:" + self.__flight + "\n" + "Hotel:\n" + self.__hotel + \
+               "\n Total price: " + str(self.__price)

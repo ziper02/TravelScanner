@@ -31,7 +31,7 @@ def get_data_by_name(trip, fetch_date=datetime.today().strftime('%Y-%m-%d')):
         hotels_data = json.load(f)
     hotels = []
     for hotel_key, hotel_val in hotels_data.items():
-        if hotels_data[hotel_key]['_fetch_date'] == fetch_date:
+        if hotels_data[hotel_key]['fetch date'] == fetch_date:
             hotels.append(Hotel(**hotels_data[hotel_key]))
     return hotels
 
@@ -88,7 +88,7 @@ def get_data_of_location_hotel_in_dates(trip, by_technique=ByTechnique.selenium)
         fetch_utility.fill_form_with_dates(driver, trip)
         accommodations_data = fetch_utility.fetch_data_for_trip(driver, req_result, trip,
                                                                 by_technique)  # get the data from driver
-        accommodations_data = {item['_name']: item for item in accommodations_data}  # transfer the list to dict
+        accommodations_data = {item['name']: item for item in accommodations_data}  # transfer the list to dict
         fetch_utility.save_hotels_order_data_to_json(accommodations_data, trip)
     finally:
         if driver:
