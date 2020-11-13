@@ -20,6 +20,3 @@
 # for trip in trip_list:
 #     print(trip.pretty_print())
 
-from Flights import general as general_flights
-
-general_flights.fetch_data()

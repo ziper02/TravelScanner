@@ -1,3 +1,5 @@
+import re
+
 import requests
 from datetime import datetime, timedelta
 from tqdm import tqdm, trange
@@ -90,7 +92,8 @@ def fetch_data():
             t_progress_bar_destination.refresh()
             data["flightList"][0]["arrivalStation"] = destination
             data["flightList"][1]["departureStation"] = destination
-            response = requests.post(DataManager.Wizzair_whole_month_request,
+            url_request_get=DataManager.Wizzair_whole_month_request.format(api_version=get_current_wizzair_api())
+            response = requests.post(url_request_get,
                                      headers=DataManager.Wizzair_headers, data=json.dumps(data))
             if response.status_code == 200:
                 data_list.append(alter_price(response.json()["outboundFlights"]))
@@ -98,3 +101,15 @@ def fetch_data():
 
     flat_list = [item for sublist in data_list for item in sublist]
     return flat_list
+
+
+def get_current_wizzair_api():
+    """
+    get the current api version of wizzair
+    :return: api version
+    :rtype: str
+    """
+    url_request_wizzair_api_version = DataManager.url_request_wizzair_api_version
+    request_wizzair_api = requests.get(url=url_request_wizzair_api_version)
+    api_version = re.search(r' https://be.wizzair.com/(.*?) ', request_wizzair_api.text).group(1).replace(' ', '')
+    return api_version
