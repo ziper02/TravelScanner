@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from pathlib import Path
 from threading import Semaphore, Thread
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
@@ -48,14 +49,14 @@ def update_data_hotels(destination='all', by_technique=ByTechnique.selenium, mul
     :type multi_thread: int
     """
     sem = None
-    if multi_thread is not None and multi_thread>1:
+    if multi_thread is not None and multi_thread > 1:
         sem = Semaphore(int(multi_thread))
     if destination == 'all':
         airports_list = flight_general.get_list_of_all_destinations()
         destinations = {airport.city for airport in airports_list}
         thread = None
         for location in destinations:
-            if multi_thread is not None and multi_thread>1:
+            if multi_thread is not None and multi_thread > 1:
                 sem.acquire()
                 thread = Thread(target=fetch_utility.update_data_per_location_hotels_without_dates,
                                 args=(location, sem, by_technique))
@@ -82,6 +83,16 @@ def get_data_of_location_hotel_in_dates(trip, by_technique=ByTechnique.selenium)
     """
     req_result = 200
     driver = None
+    try:
+        start_date_dt = datetime.strptime(trip.start_date, '%Y-%m-%d')
+        already_fetched_check = Path(os.path.dirname(__file__) + '/../Data/Hotels/Order Data/{selected_month}/'
+                                                                 '{location}/''{start_date}_{end_date}.json'.format(
+            selected_month=datetime.strftime(start_date_dt, "%Y-%m"), location=trip.destination,
+            start_date=trip.start_date, end_date=trip.end_date))
+        if already_fetched_check.is_file():
+            return
+    except Exception:
+        pass
     try:
         driver = fetch_utility.prepare_driver_chrome('https://www.booking.com')  # lunch driver to Booking
         WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.ID, 'ss')))

@@ -1,7 +1,7 @@
 import json
 import os
 from datetime import datetime
-
+import moderator
 from Entity.Airport import Airport
 
 
@@ -33,21 +33,23 @@ class Flight:
     __calculated_value: int
     __destination_value: int
 
-    def __init__(self, departure: Airport = None, destination: Airport = None, depart_date: str = '',
-                 return_date: str = '', price: int = -1,
-                 source: str = 'unknown', label: int = -1, data_set: str = 'unknown', **json_text: dict):
-        if departure is not None:
-            self.__departure = departure
-            self.__destination = destination
-            self.__depart_date = depart_date
-            self.__return_date = return_date
-            self.__price = price
-            self.__label = label
-            self.__source = source
-            self.__data_set = data_set
+    with open(os.path.dirname(__file__) + "/../Data/Flights/dict_rate_dest.json", 'r', encoding="utf-8") as f:
+        __rate_dest = json.load(f)
+
+    def __init__(self, flying_out: Airport = None, flying_back: Airport = None, flying_out_date: str = '',
+                 flying_back_date: str = '', price_per_adult: int = -1,
+                 source_site: str = 'unknown', rating_of_flight: int = -1, data_set_of_flight: str = 'unknown',
+                 **json_text: dict):
+        if flying_out is not None:
+            self.__departure = flying_out
+            self.__destination = flying_back
+            self.__depart_date = flying_out_date
+            self.__return_date = flying_back_date
+            self.__price = price_per_adult
+            self.__label = rating_of_flight
+            self.__source = source_site
+            self.__data_set = data_set_of_flight
             self.__calculated_value = -1
-            self.__destination_value = -1
-            self.__days = -1
         else:
             try:
                 json_text = json_text["json_text"]
@@ -62,14 +64,14 @@ class Flight:
             self.__destination = Airport(**json_text.pop("destination"))
             self.__departure = Airport(**json_text.pop("departure"))
         try:
-            with open(os.path.dirname(__file__) + "/../Data/Flights/dict_rate_dest.json", 'r', encoding="utf-8") as f:
-                rate_dest = json.load(f)
-            self.__destination_value = rate_dest[self.__destination.code]
+            self.__destination_value = self.__rate_dest[self.__destination.code]
         except Exception:
-            pass
+            self.__destination_value = -1
         if self.__depart_date != '' and self.__return_date != '':
             self.__days = (datetime.strptime(self.__return_date, '%Y-%m-%d') - datetime.strptime(
                 self.__depart_date, '%Y-%m-%d')).days
+        else:
+            self.__days = -1
 
     def to_json(self):
         """
@@ -92,6 +94,10 @@ class Flight:
         return self.__departure
 
     @property
+    def source(self):
+        return self.__source
+
+    @property
     def days(self) -> int:
         if self.__days != -1:
             return self.__days
@@ -107,9 +113,8 @@ class Flight:
     @property
     def destination_value(self) -> int:
         if self.__destination_value == -1 and self.__destination is not None:
-            with open(os.path.dirname(__file__) + "/../Data/Flights/dict_rate_dest.json", 'r', encoding="utf-8") as f:
-                rate_dest = json.load(f)
-            self.__destination_value = rate_dest[self.__destination.code]
+            self.__destination_value = self.__rate_dest[
+                moderator.transfer_airport_cod_names_to_all(self.__destination.code)]
         return self.__destination_value
 
     @property
@@ -128,14 +133,26 @@ class Flight:
     def label(self) -> int:
         return self.__label
 
+    @label.setter
+    def label(self, value):
+        if isinstance(value, int):
+            if -1 < value < 5:
+                self.__label = value
+
     @property
     def data_set(self) -> str:
         return self.__data_set
 
+    @data_set.setter
+    def data_set(self, value):
+        if isinstance(value, str):
+            if value == "Train" or value == "Test":
+                self.__data_set = value
+
     def __str__(self):
-        return "\ndestination:  " + str(self.__destination.name) + " " + str(self.__destination.country.name) + \
-               "\ndepart date:  " + str(self.__depart_date) + " return date:  " + str(self.__return_date) + \
-               "\nprice:  " + str(self.__price)
+        return "\ndestination: " + str(self.__destination.name) + " " + str(self.__destination.country.name) + \
+               "\ndepart date: " + str(self.__depart_date) + " return date: " + str(self.__return_date) + \
+               "\nprice: " + str(self.__price) + " site source: " + str(self.__source)
 
     def __eq__(self, other):
         if isinstance(other, Flight):

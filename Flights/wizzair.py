@@ -10,15 +10,17 @@ from Entity.Airport import Airport
 from Entity.Flight import Flight
 from Flights import general
 
-
+my_blacounter=0
 def export_whole_month_all_dest():
     """
     Fetch data from Wizzair.com for all the detentions from TLV,
     parse him to Flight format and save the data as json in Data\\Flights folder.
     """
+    global my_blacounter
     flights_data = fetch_data()
     destinations = moderator.destination_list_wizzair
     departs = moderator.depart_list
+    flights_data_most_updated = []
     for depart in departs:
         depart_flight = Airport(depart)
         t_progress_bar_destination = tqdm(destinations, leave=True)
@@ -42,15 +44,17 @@ def export_whole_month_all_dest():
             combination_flights = []
             for item_depart in depart_destination_list:
                 for item_return in destination_depart_list:
-                    combination_flights.append(Flight(departure=depart_flight, destination=destination_flight,
-                                                      depart_date=item_depart["departureDate"],
-                                                      return_date=item_return["departureDate"],
-                                                      price=item_depart["price"]["amount"] + item_return["price"][
-                                                          "amount"],
-                                                      source="Wizzair"))
+                    combination_flights.append(Flight(flying_out=depart_flight, flying_back=destination_flight,
+                                                      flying_out_date=item_depart["departureDate"],
+                                                      flying_back_date=item_return["departureDate"],
+                                                      price_per_adult=item_depart["price"]["amount"] + item_return
+                                                      ["price"]["amount"], source_site="Wizzair"))
             flights_filter = [flight for flight in combination_flights if
                               3 <= flight.days < 7]
+            my_blacounter = my_blacounter + len(flights_filter)
             flights_per_year_month_dict = {}
+            if len(flights_filter) != 0:
+                flights_data_most_updated.extend(flights_filter)
             for flight_item in flights_filter:
                 depart_date_dt = datetime.strptime(flight_item.depart_date, '%Y-%m-%d')
                 if datetime.strftime(depart_date_dt, "%Y-%m") in flights_per_year_month_dict:
@@ -58,9 +62,13 @@ def export_whole_month_all_dest():
                 else:
                     flights_per_year_month_dict[datetime.strftime(depart_date_dt, "%Y-%m")] = []
                     flights_per_year_month_dict[datetime.strftime(depart_date_dt, "%Y-%m")].append(flight_item)
+
+            # update json files
             for key in flights_per_year_month_dict:
                 general.update_json_files(flights=flights_per_year_month_dict[key],
                                           year_month_date_depart=key, destination=destination_flight)
+    print(my_blacounter)
+    general.update_most_updated_flights(flights_data_most_updated)
 
 
 def alter_price(flights):
@@ -92,7 +100,7 @@ def fetch_data():
             t_progress_bar_destination.refresh()
             data["flightList"][0]["arrivalStation"] = destination
             data["flightList"][1]["departureStation"] = destination
-            url_request_get=DataManager.Wizzair_whole_month_request.format(api_version=get_current_wizzair_api())
+            url_request_get = DataManager.Wizzair_whole_month_request.format(api_version=get_current_wizzair_api())
             response = requests.post(url_request_get,
                                      headers=DataManager.Wizzair_headers, data=json.dumps(data))
             if response.status_code == 200:

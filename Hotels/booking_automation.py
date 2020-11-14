@@ -25,7 +25,8 @@ def scrape_accommodation_data(driver, accommodation_url, trip, location_dict):
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'hp_hotel_name')))
     key = driver.find_element_by_id('hp_hotel_name') \
         .text.strip('trip').replace('\n', ' ')
-    accommodation_fields = fetch_utility.get_hotel_data(driver, key, location_dict, fetch_utility.ByTechnique.selenium)
+    accommodation_fields = fetch_utility.get_hotel_data(page=driver, key=key, trip=trip, location_dict=location_dict,
+                                                        by_technique=fetch_utility.ByTechnique.selenium)
     if accommodation_fields is not None:
         return scrape_accommodation_data_only_price_and_update_dates(driver, accommodation_fields, trip)
     else:

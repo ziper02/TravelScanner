@@ -3,6 +3,7 @@ from Hotels import general as general_hotel
 from Entity.Hotel import Hotel
 from Entity.Flight import Flight
 from Hotels import general as hotel_general
+import fetch_utility
 
 
 class Trip:
@@ -19,7 +20,7 @@ class Trip:
     __hotel: Hotel
     __start_date: str
     __end_date: str
-    __price: int
+    __price: float
     __alternative_hotels: list
 
     def __init__(self, flight: Flight = None, start_date: str = '', end_date: str = '', hotel: Hotel = None,
@@ -28,7 +29,7 @@ class Trip:
             self.__flight = flight
             self.__end_date = self.__flight.return_date
             self.__start_date = self.__flight.depart_date
-            self.__hotel = Hotel(city=self.flight.destination.city)
+            self.__hotel = Hotel(city_located=self.flight.destination.city)
             self.__update_hotels()
             self.__price = 2 * self.__flight.price + self.__hotel.price
         else:
@@ -46,10 +47,10 @@ class Trip:
         :param fetch_date:the date that the data fetched
         :type fetch_date: Datetime
         """
-        hotel_general.get_data_of_location_hotel_in_dates(self)
+        hotel_general.get_data_of_location_hotel_in_dates(self, by_technique=fetch_utility.ByTechnique.requests)
         hotels_data = general_hotel.get_data_by_name(self, fetch_date)
-        hotels_data = [hotel for hotel in hotels_data if hotel.price != 'no available']
         hotels_data = [hotel for hotel in hotels_data if not isinstance(hotel.price, str)]
+        hotels_data = [hotel for hotel in hotels_data if hotel.price != 'no available' and hotel.price > 0]
         hotels_data.sort(key=lambda x: int(x.price), reverse=False)
         self.__hotel = hotels_data.pop(0)
         self.__alternative_hotels = hotels_data
@@ -63,7 +64,7 @@ class Trip:
         return self.__flight
 
     @property
-    def price(self) -> int:
+    def price(self) -> float:
         return self.__price
 
     @property
@@ -86,5 +87,13 @@ class Trip:
         return "Flight:\n" + str(self.__flight) + "\n" + "Hotel:\n" + str(self.__hotel)
 
     def __str__(self):
-        return "Flight:" + self.__flight + "\n" + "Hotel:\n" + self.__hotel + \
-               "\n Total price: " + str(self.__price)
+        return "Flight:" + str(self.__flight) + "\n" + "Hotel:\n" + str(self.__hotel) + \
+               "\nTotal price: " + str(self.__price)
+
+    def __lt__(self, other):
+        if isinstance(other, Trip):
+            return self.__price < other.__price
+
+    def __gt__(self, other):
+        if isinstance(other, Trip):
+            return self.__price > other.__price

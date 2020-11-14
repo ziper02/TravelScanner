@@ -211,7 +211,7 @@ class Hotel:
     def __str__(self):
         return "name: " + str(self.__name) + " city: " + str(self.__city) + "\nscore: " \
                + str(self.__score) + " location: " + str(self.__location) + " price: " \
-               + str(self.__price)
+               + str(self.__price)+ "\nlink: " + str(self.__link)
 
     def __repr__(self):
         return "Hotel:: name: " + self.__name + " city: " + self.__city + " score: " + str(self.__score) \

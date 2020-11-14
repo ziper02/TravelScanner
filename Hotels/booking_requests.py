@@ -24,7 +24,7 @@ def scrape_accommodation_data(accommodation_url, trip, location_dict):
         start_date=trip.start_date, end_date=trip.end_date)
     request = requests.get(url=request_url, headers=DataManager.booking_headers)
     page = request.text
-    html_page = re.split(page, '\n')
+    html_page = page.split('\n')
     key = None
     for i in range(len(html_page)):
         line = html_page[i]
@@ -37,7 +37,7 @@ def scrape_accommodation_data(accommodation_url, trip, location_dict):
             pre = re.search(r'>(.*?)<', lst[-2]).group(1).replace('\n', ' ')
             hotel_name = lst[-1].rstrip()
             key = pre + ' ' + hotel_name
-    accommodation_fields = fetch_utility.get_hotel_data(page, key, location_dict,
+    accommodation_fields = fetch_utility.get_hotel_data(page=page, key=key, trip=trip, location_dict=location_dict,
                                                         by_technique=fetch_utility.ByTechnique.requests)
     if accommodation_fields is not None:
         return scrape_accommodation_data_only_price_and_update_dates(accommodation_fields, trip, page)

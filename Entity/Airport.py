@@ -18,6 +18,9 @@ class Airport:
     __city: str
     __country: Country
 
+    with open(os.path.dirname(__file__) + '/../Data/Flights/airports_countries.json') as f:
+        __data = json.load(f)
+
     def __init__(self, code: str = '', **json_text: dict):
         if code != '':
             self.__code = code
@@ -37,15 +40,13 @@ class Airport:
         initialize the details of airports according to his shortcut name(code)
         from local data
         """
-        with open(os.path.dirname(__file__) + '/../Data/Flights/airports_countries.json') as f:
-            data = json.load(f)
-            self.__name = data[self.__code]["airportName"]
-            self.__country = Country(name=data[self.__code]["countryName"],
-                                     code=data[self.__code]["countryCode"])
-            try:
-                self.__city = data[self.__code]["city"]
-            except Exception:
-                self.__city = ''
+        self.__name = self.__data[self.__code]["airportName"]
+        self.__country = Country(name=self.__data[self.__code]["countryName"],
+                                 code=self.__data[self.__code]["countryCode"])
+        try:
+            self.__city = self.__data[self.__code]["city"]
+        except Exception:
+            self.__city = ''
 
     def to_json(self):
         """

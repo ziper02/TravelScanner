@@ -1,9 +1,14 @@
 import json
 import os
+import queue
+import threading
+import time
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 import re
+from threading import Semaphore, Thread
+
 import moderator
 from Entity.Airport import Airport
 from Entity.Flight import Flight
@@ -147,38 +152,87 @@ def get_files_list_of_location(name):
     return json_files_dict[fullname_airport]
 
 
-def get_updated_data_by_name(name):
+def get_all_updated_data(multi_thread=None):
+    """
+    get all the flights of all destinations in that that fetched today-the most updated flights
+    :param multi_thread: how much threads use for get the data from files
+    :type multi_thread: int
+    :return: list of updated flights of destination
+    :rtype: list(flight)
+    """
+    multi_thread_decide = False
+    sem = None
+    return_que = None
+    if multi_thread is not None and multi_thread > 1:
+        sem = Semaphore(int(multi_thread))
+        return_que = queue.Queue()
+        multi_thread_decide = True
+
+    with open(os.path.dirname(__file__) + "/../Data/Flights/dict_rate_dest.json", 'r') as f:
+        rate_dest = json.load(f)  # load all paths of files
+    flight_data = []
+    threads = []
+    # get the data of destinations
+    for dest_key in rate_dest.keys():
+        if multi_thread_decide:
+            sem.acquire()
+            thread = Thread(target=get_updated_data_by_name, args=(dest_key, sem, return_que))
+            thread.start()
+            threads.append(thread)
+        else:
+            flight_data.extend(get_updated_data_by_name(dest_key))
+
+    if multi_thread_decide:  # if multi-threading, waiting that all threads will finish
+        for thread_item in threads:
+            thread_item.join()
+        for i in range(len(threads)):
+            flight_data.extend(return_que.get())
+    return flight_data
+
+
+def get_updated_data_by_name(name, sem=None, return_que=None):
     """
     get all the flights of destination that fetched today-the most updated flights
     :param name: The shortcut of the airport
     :type name: str
+    :param sem: semaphore for multithreading get data
+    :type sem: threading.Semaphore
+    :param return_que: queue for return result for multithreading
+    :type return_que: queue
     :return: list of updated flights of destination
     :rtype: list(flight)
     """
-    files_lst = get_files_list_of_location(name)
-    today_date = datetime.today().strftime('%Y-%m-%d')
-    updated_data_lst = [item for item in files_lst if today_date in item]
+    try:
+        files_lst = get_files_list_of_location(name)
+        today_date = (datetime.today()- timedelta(days=1)).strftime('%Y-%m-%d')
+        updated_data_lst = [item for item in files_lst if today_date in item]
+        flights_data = []
+        # get the data from files
+        for json_file in updated_data_lst:
+            flights_data.extend(get_flights_data_from_json_file(json_file))
+        if sem is not None:
+            return_que.put(flights_data)
+        else:
+            return flights_data
+    finally:
+        if sem is not None:
+            sem.release()
+
+
+def get_flights_data_from_json_file(json_file):
+    """
+    get the data of flights from this json as list of flights
+    :param json_file:the path of json file that contains flights
+    :type json_file: str
+    :return:flights data from this json
+    :rtype list(Flight)
+    """
     flights_data = []
-    for json_file in updated_data_lst:
-        with open(os.path.dirname(__file__) + "/../" + json_file) as f:
-            data = json.load(f)
-        for temp in data:
-            flights_data.append(Flight(**temp))
+    with open(os.path.dirname(__file__) + "/../" + json_file) as f:
+        data = json.load(f)
+    for temp in data:
+        flights_data.append(Flight(**temp))
     return flights_data
-
-
-def get_all_updated_data():
-    """
-    get all the flights of all destinations in that that fetched today-the most updated flights
-    :return: list of updated flights of destination
-    :rtype: list(flight)
-    """
-    with open(os.path.dirname(__file__) + "/../Data/Flights/dict_rate_dest.json", 'r') as f:
-        rate_dest = json.load(f)
-    flight_data = []
-    for dest_key in rate_dest.keys():
-        flight_data.extend(get_updated_data_by_name(dest_key))
-    return flight_data
 
 
 def update_json_dest_by_list(flight_data):
@@ -250,3 +304,40 @@ def get_list_of_all_destinations():
     for airport_code in airports_code:
         airports.append(Airport(moderator.transfer_airport_cod_names_to_all(airport_code)))
     return airports
+
+
+def update_most_updated_flights(flights_data=[]):
+    """
+    :param flights_data:
+    :type flights_data: list[Flight]
+    """
+    if len(flights_data) == 0:
+        return
+    else:
+        source_site = flights_data[0].source
+
+    with open(os.path.dirname(__file__) + "/../Data/Flights/most_updated_flights.json", 'r', encoding='utf-8') as f:
+        most_updated_flights = json.load(f)
+
+    most_updated_flights = [item for item in most_updated_flights if item['source'] != source_site]
+    flight_dump_list = [item.to_json() for item in flights_data]
+    most_updated_flights.extend(flight_dump_list)
+
+    with open(os.path.dirname(__file__) + "/../Data/Flights/most_updated_flights.json", 'w', encoding='utf-8') as f:
+        json.dump(most_updated_flights, f, indent=4)
+
+
+def get_updated_data_from_json_file():
+    """
+    get all the flights of all destinations in that that fetched today-the most updated flights
+    the data load from most_updated_flights , its alternative for get_all_updated_data
+    :return: list of updated flights of destination
+    :rtype: list(flight)
+    """
+    with open(os.path.dirname(__file__) + "\..\Data\Flights\most_updated_flights.json", 'r', encoding='utf-8') as f:
+        flights_data_json = json.load(f)
+    flights_data=[]
+    for flight_json in flights_data_json:
+        flights_data.append(Flight(**flight_json))
+    return flights_data
+

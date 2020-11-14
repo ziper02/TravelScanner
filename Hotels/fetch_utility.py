@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 from pathlib import Path
 from enum import Enum
-from Trip import Trip
 import traceback
 import platform
 import selenium
@@ -14,6 +13,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 import booking_automation
 import booking_requests
 import json
+import copy
 
 
 class ByTechnique(Enum):
@@ -28,7 +28,7 @@ def save_hotels_order_data_to_json(accommodations_data, trip):
     :param accommodations_data:
     :type accommodations_data: dict
     :param trip:Trip object with Destination,Check-in and Check-out
-    :type trip: Trip
+    :type trip: Trip.Trip
     """
     start_date_dt = datetime.strptime(trip.start_date, '%Y-%m-%d')  # write the data to json files
     Path(os.path.dirname(__file__) + '/../Data/Hotels/Order Data/' + datetime.strftime(start_date_dt,
@@ -53,12 +53,12 @@ def save_hotels_order_data_to_json(accommodations_data, trip):
     accommodations_data = json.dumps(accommodations_data, indent=4)
     with open(os.path.dirname(
             __file__) + '/../Data/Hotels/Order Data/{selected_month}/{location}/{start_date}_{end_date}.json'.format(
-            selected_month=datetime.strftime(start_date_dt, "%Y-%m"), location=trip.destination,
-            start_date=trip.start_date, end_date=trip.end_date), 'w') as f:
+        selected_month=datetime.strftime(start_date_dt, "%Y-%m"), location=trip.destination,
+        start_date=trip.start_date, end_date=trip.end_date), 'w') as f:
         f.write(accommodations_data)
 
 
-def get_hotel_data(page, key, location_dict, by_technique=ByTechnique.selenium):
+def get_hotel_data(page, key, trip, location_dict, by_technique=ByTechnique.selenium):
     """
     get the hotel data, if the data exist in data folder , just return the exist
     information , if not fetch from booking.com,save it and return the information
@@ -68,6 +68,8 @@ def get_hotel_data(page, key, location_dict, by_technique=ByTechnique.selenium):
                 else str
     :param key:full hotel name
     :type key: str
+    :param trip:the destination with check-in and check-out
+    :type trip: Trip.Trip
     :param location_dict:data of all hotels that exist in data folder
     :type location_dict: dict
     :param by_technique:fetch data if hotel not found in data folder
@@ -83,7 +85,7 @@ def get_hotel_data(page, key, location_dict, by_technique=ByTechnique.selenium):
                 driver=page, accommodation_url=accommodation_url, need_fetch=False)
         else:
             accommodation_fields = booking_requests.scrape_accommodation_data_without_price(
-                page=page, accommodation_url=accommodation_url, need_fetch=False)
+                page=page, need_fetch=False)
         if accommodation_fields is not None:
             location_dict[key] = accommodation_fields
             with open(os.path.dirname(__file__) + '/../Data/Hotels/Locations Data/{location}.json'.format(
@@ -102,13 +104,13 @@ def fetch_data_for_trip(driver, n_results, trip, by_technique=ByTechnique.seleni
     :param n_results: how much hotel to scrape
     :type n_results: int
     :param trip:the destination with check-in and check-out
-    :type trip: Trip
+    :type trip: Trip.Trip
     :param by_technique: which technique use for fetch data selenium/get
     :type: ByTechnique
     :return: dict{"hotel_name":data} of hotels with all the the data that required
     :rtype: dict
     """
-    accommodations_urls = fetch_utility.get_all_hotel_links_per_driver(driver, n_results)
+    accommodations_urls = get_all_hotel_links_per_driver(driver, n_results)
     accommodations_data = list()
     with open(os.path.dirname(__file__) + '/../Data/Hotels/Locations Data/{location}.json'.format(
             location=trip.destination), 'r') as JSON:
@@ -151,7 +153,10 @@ def get_all_hotel_links_per_driver(driver, n=None):
         for accommodation_title in driver.find_elements_by_class_name('sr-hotel__title'):
             accommodations_urls.append(accommodation_title.find_element_by_class_name(
                 'hotel_name_link').get_attribute('href'))
-        driver.get(page_list[page + 1])
+        try:
+            driver.get(page_list[page + 1])
+        except Exception:
+            break
     accommodations_urls = list(dict.fromkeys(accommodations_urls))
     return accommodations_urls
 
@@ -252,7 +257,7 @@ def fill_form_with_dates(driver, trip):
     :rtype: object
     :type driver: selenium.webdriver.chrome.webdriver.WebDriver
     :param trip:the destination with check-in and check-out
-    :type trip: Trip
+    :type trip: Trip.Trip
     """
     search_field = driver.find_element_by_id('ss')
     search_field.send_keys(trip.destination)

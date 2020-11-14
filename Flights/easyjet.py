@@ -1,7 +1,6 @@
 import time
 from datetime import datetime
 from Data import DataManager
-
 import requests
 from dateutil.relativedelta import relativedelta
 from tqdm import tqdm
@@ -11,7 +10,7 @@ from Entity.Airport import Airport
 from Entity.Flight import Flight
 from Flights import general
 
-
+my_blacounter=0
 def export_whole_months_all_dest():
     """
     Fetch data from Easyjet.com for all the detentions from TLV,
@@ -19,13 +18,18 @@ def export_whole_months_all_dest():
     """
     depart_list = [Airport(code=o) for o in moderator.depart_list]
     destination_list = [Airport(code=o) for o in moderator.destination_list_easyjet]
+    flights_data = []
     for depart in depart_list:
         t_progress_bar_destination = tqdm(destination_list, leave=True)
         for destination in t_progress_bar_destination:
             t_progress_bar_destination.set_description("EasyJet " + destination.name)
             t_progress_bar_destination.refresh()
-            export_whole_months(depart=depart, destination=destination)
+            flights_to_dest = export_whole_months(depart=depart, destination=destination)
+            if len(flights_to_dest) != 0:
+                flights_data.extend(flights_to_dest)
             time.sleep(0.6)
+    print(my_blacounter)
+    general.update_most_updated_flights(flights_data)
 
 
 def export_whole_months(depart=None, destination=None):
@@ -35,11 +39,11 @@ def export_whole_months(depart=None, destination=None):
     :type depart: Airport
     :param destination: The destination of the flight
     :type destination: Airport
+    :return return list of flights from departure airport to destination airport
+    :rtype list[Flight]
     """
+    global my_blacounter
     whole_month_url = DataManager.Easyjet_whole_month_request
-    currency_url = DataManager.currency_conversion.format(src='EUR', dest='ILS')
-    request_currency = requests.get(url=currency_url)
-    exchange_rate = request_currency.json()['EUR_ILS']
     date_str = datetime.today().strftime('%Y-%m-%d')
     request_whole_month_url = whole_month_url.format(depart=depart.code, destination=destination.code,
                                                      depart_date=date_str)
@@ -60,9 +64,11 @@ def export_whole_months(depart=None, destination=None):
             data_return[len(data_return) - 1]["monthDisplayName"]) + '-' \
                                          + str(len(data_return[len(data_return) - 1]['days']))
     except Exception:
-        return
+        #print(f'EasyJet missing flight to -{destination}')
+        return list()
     return_max_date_datetime = datetime.strptime(year_month_day_date_return_str, '%Y-%m-%d')
     flights = []
+    flights_data = []
     for month in data_depart:
         year_month_date_depart = str(month["year"]) + '-' + moderator.month_string_to_number(month["monthDisplayName"])
         days = month['days']
@@ -91,11 +97,20 @@ def export_whole_months(depart=None, destination=None):
                         if not data_return[month_return]['days'][day_return]['lowestFare'] is None:
                             price_return = data_return[month_return]['days'][day_return]['lowestFare']
                             total_price = exchange_rate * (price_depart + price_return)
-                            flight = Flight(departure=depart, destination=destination,
-                                            depart_date=selected_date_depart_str,
-                                            return_date=selected_date_return_str, price=total_price, source='Easyjet')
+                            flight = Flight(flying_out=depart, flying_back=destination,
+                                            flying_out_date=selected_date_depart_str,
+                                            flying_back_date=selected_date_return_str, price_per_adult=total_price,
+                                            source_site='Easyjet')
                             flights.append(flight)
+                            my_blacounter = my_blacounter +1
             day_index = day_index + 1
-        general.update_json_files(flights=flights, year_month_date_depart=year_month_date_depart,
-                                  destination=destination)
+        if len(flights) != 0:
+            general.update_json_files(flights=flights, year_month_date_depart=year_month_date_depart,
+                                      destination=destination)
+            flights_data.extend(flights)
         flights = []
+    return flights_data
+
+currency_url = DataManager.currency_conversion.format(src='EUR', dest='ILS')
+request_currency = requests.get(url=currency_url)
+exchange_rate = request_currency.json()['EUR_ILS']
