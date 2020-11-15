@@ -1,33 +1,24 @@
-import time
-from datetime import datetime
-from Trip import Trip
+import json
+
+from Hotels import general as hotel_general
 from Flights import general as flight_general
 
-
-def test_order_hotel():
-    flights_data = flight_general.get_all_updated_data()
-
-    data_in_range = [flight for flight in flights_data if
-                     (flight.days == 5 or flight.days == 6) and flight.destination_value <25 and (
-                             flight.label == 4 or flight.label == 3)
-                     and datetime.strptime(flight.return_date, '%Y-%m-%d') < datetime(2021, 1, 1)]
-
-    data_in_range.sort()
-    trip_list = []
-    time_start=time.time()
-    for i in range(26, 27):
-        flight = data_in_range[i]
-        trip_list.append(Trip(flight))
-
-    trip_list.sort(reverse=True)
-    for trip in trip_list:
-        print(trip)
-
-    time_end=time.time()
-    print((time_end-time_start)/60)
+hotels_data = hotel_general.get_all_location_data(with_json_file=True)
+counter = 0
+write_back_data = []
+for hotel, json_file in hotels_data:
+    if hotel.link != '':
+        counter+=1
+print(len(hotels_data))
+print(counter)
 
 
+flights_data=flight_general.get_all_updated_data()
+count=0
+dest=set()
+for flight in flights_data:
+    if flight.label==-1:
+        dest.update([flight.destination.city])
+        count=count+1
 
-if __name__ == "__main__":
-    #flight_general.label_all_flights_by_price_range()
-    test_order_hotel()
+print(count)

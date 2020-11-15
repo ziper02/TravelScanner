@@ -96,13 +96,17 @@ def get_location_data_by_city_name(city_name, with_json_file=False):
     :rtype: list[Hotel]
     """
     path_to_json = os.path.dirname(__file__) + '/../Data/Hotels/Locations Data/' + city_name + '.json'
-    with open(path_to_json, 'r', encoding='utf-8') as f:
-        hotels_data_dict = json.load(f)
 
+    try:
+        with open(path_to_json, 'r', encoding='utf-8') as f:
+            hotels_data_dict = json.load(f)
+    except FileNotFoundError:
+        print(city_name+" not found("+path_to_json+")")
+        return []
     hotels_data = []
     for key, val in hotels_data_dict.items():
         if with_json_file:
-            hotels_data.append(Hotel(**val), path_to_json)
+            hotels_data.append((Hotel(**val), path_to_json))
         else:
             hotels_data.append(Hotel(**val))
     return hotels_data
@@ -124,5 +128,5 @@ def get_all_location_data(with_json_file=False):
     city_list = [airport.city for airport in dest_list]
     hotels_data = []
     for city in city_list:
-        hotels_data.append(get_location_data_by_city_name(city, with_json_file))
+        hotels_data.extend(get_location_data_by_city_name(city, with_json_file))
     return hotels_data

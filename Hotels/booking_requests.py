@@ -40,6 +40,7 @@ def scrape_accommodation_data(accommodation_url, trip, location_dict):
     accommodation_fields = fetch_utility.get_hotel_data(page=page, key=key, trip=trip, location_dict=location_dict,
                                                         by_technique=fetch_utility.ByTechnique.requests)
     if accommodation_fields is not None:
+        accommodation_fields['link']=accommodation_url
         return scrape_accommodation_data_only_price_and_update_dates(accommodation_fields, trip, page)
     else:
         return None

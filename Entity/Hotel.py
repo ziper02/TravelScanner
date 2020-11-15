@@ -164,6 +164,11 @@ class Hotel:
     def city(self) -> str:
         return self.__city
 
+    @city.setter
+    def city(self, value):
+        if isinstance(value, str):
+            self.__city = value
+
     @property
     def value_for_money(self) -> float:
         return self.__value_for_money

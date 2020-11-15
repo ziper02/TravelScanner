@@ -1,10 +1,11 @@
 import time
 from datetime import datetime
+
+import DataManager
 from Data import DataManager
 import requests
 from dateutil.relativedelta import relativedelta
 from tqdm import tqdm
-import moderator
 from DataManager import DataManager
 from Entity.Airport import Airport
 from Entity.Flight import Flight
@@ -15,8 +16,8 @@ def export_whole_months_all_dest():
     Fetch data from Easyjet.com for all the detentions from TLV,
     and save the data as json in Data\\Flights folder.
     """
-    depart_list = [Airport(code=o) for o in moderator.depart_list]
-    destination_list = [Airport(code=o) for o in moderator.destination_list_easyjet]
+    depart_list = [Airport(code=o) for o in DataManager.depart_list]
+    destination_list = [Airport(code=o) for o in DataManager.destination_list_easyjet]
     flights_data = []
     for depart in depart_list:
         t_progress_bar_destination = tqdm(destination_list, leave=True)
@@ -57,7 +58,7 @@ def export_whole_months(depart=None, destination=None):
     data_return = data_return_hash["months"]
     try:
         year_month_day_date_return_str = str(
-            data_return[len(data_return) - 1]["year"]) + '-' + moderator.month_string_to_number(
+            data_return[len(data_return) - 1]["year"]) + '-' + DataManager.month_string_to_number(
             data_return[len(data_return) - 1]["monthDisplayName"]) + '-' \
                                          + str(len(data_return[len(data_return) - 1]['days']))
     except Exception:
@@ -67,7 +68,7 @@ def export_whole_months(depart=None, destination=None):
     flights = []
     flights_data = []
     for month in data_depart:
-        year_month_date_depart = str(month["year"]) + '-' + moderator.month_string_to_number(month["monthDisplayName"])
+        year_month_date_depart = str(month["year"]) + '-' + DataManager.month_string_to_number(month["monthDisplayName"])
         days = month['days']
         day_index = 0
         for day in days:

@@ -81,11 +81,12 @@ def get_hotel_data(page, key, trip, location_dict, by_technique=ByTechnique.sele
         accommodation_fields = copy.deepcopy(location_dict[key])
     else:  # if not exist in our data fetch the data from booking and save him to data folder
         if by_technique == ByTechnique.selenium:
-            accommodation_fields = booking_automation.scrape_accommodation_data_without_price(
-                driver=page, accommodation_url=accommodation_url, need_fetch=False)
+            accommodation_fields = booking_automation.scrape_accommodation_data_without_price(driver=page,
+                                                                                              accommodation_url
+                                                                                              =accommodation_url,
+                                                                                              need_fetch=False)
         else:
-            accommodation_fields = booking_requests.scrape_accommodation_data_without_price(
-                page=page, need_fetch=False)
+            accommodation_fields = booking_requests.scrape_accommodation_data_without_price(page=page,need_fetch=False)
         if accommodation_fields is not None:
             location_dict[key] = accommodation_fields
             with open(os.path.dirname(__file__) + '/../Data/Hotels/Locations Data/{location}.json'.format(

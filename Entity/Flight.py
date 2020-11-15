@@ -1,7 +1,8 @@
 import json
 import os
 from datetime import datetime
-import moderator
+
+from DataManager import DataManager
 from Entity.Airport import Airport
 
 
@@ -26,7 +27,7 @@ class Flight:
     __depart_date: str
     __return_date: str
     __days: int
-    __price: int
+    __price: float
     __label: int
     __source: str
     __data_set: str
@@ -114,7 +115,7 @@ class Flight:
     def destination_value(self) -> int:
         if self.__destination_value == -1 and self.__destination is not None:
             self.__destination_value = self.__rate_dest[
-                moderator.transfer_airport_cod_names_to_all(self.__destination.code)]
+                DataManager.transfer_airport_cod_names_to_all(self.__destination.code)]
         return self.__destination_value
 
     @property
@@ -126,7 +127,7 @@ class Flight:
         return self.__return_date
 
     @property
-    def price(self) -> int:
+    def price(self) -> float:
         return self.__price
 
     @property
@@ -150,9 +151,16 @@ class Flight:
                 self.__data_set = value
 
     def __str__(self):
-        return "\ndestination: " + str(self.__destination.name) + " " + str(self.__destination.country.name) + \
-               "\ndepart date: " + str(self.__depart_date) + " return date: " + str(self.__return_date) + \
-               "\nprice: " + str(self.__price) + " site source: " + str(self.__source)
+        if self.__destination.city != '':
+            return "\ndestination: " + str(self.__destination.city) + "(" + str(self.__destination.code) + ") " \
+                   + str(self.__destination.country.name) + "\ndepart date: " + str(self.__depart_date) \
+                   + " return date: " + str(self.__return_date) + "\nprice: " + str(self.__price) + " site source: " \
+                   + str(self.__source)
+        else:
+            return "\ndestination: " + str(self.__destination.name) + "(" + str(self.__destination.code) + ") " \
+                   + str(self.__destination.country.name) + "\ndepart date: " + str(self.__depart_date) \
+                   + " return date: " + str(self.__return_date) + "\nprice: " + str(self.__price) + " site source: " \
+                   + str(self.__source)
 
     def __eq__(self, other):
         if isinstance(other, Flight):

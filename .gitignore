@@ -1,7 +1,9 @@
+*.pyc
 *.json
 *.log
 .env
 .venv
+chromedriver.exe
 env/
 venv/
 ENV/

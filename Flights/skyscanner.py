@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 import requests
 from dateutil.relativedelta import relativedelta
-import moderator
+import DataManager
 from DataManager import DataManager
 from Entity.Airport import Airport
 from Entity.Flight import Flight
@@ -20,8 +20,8 @@ def export_whole_month_all_dest():
     date_selected = datetime.today()
     dates = []
     flight_data = []
-    depart_list = [Airport(code=o) for o in moderator.depart_list]
-    destination_list = [Airport(code=o) for o in moderator.destination_list_skyscanner]
+    depart_list = [Airport(code=o) for o in DataManager.depart_list]
+    destination_list = [Airport(code=o) for o in DataManager.destination_list_skyscanner]
     for i in range(11):
         dates.append(date_selected)
         date_selected = date_selected + relativedelta(months=1)
