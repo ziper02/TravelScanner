@@ -58,7 +58,7 @@ def save_hotels_order_data_to_json(accommodations_data, trip):
         f.write(accommodations_data)
 
 
-def get_hotel_data(page, key, trip, location_dict, by_technique=ByTechnique.selenium):
+def get_hotel_data(page, accommodation_url, key, trip, location_dict, by_technique=ByTechnique.selenium):
     """
     get the hotel data, if the data exist in data folder , just return the exist
     information , if not fetch from booking.com,save it and return the information
@@ -86,7 +86,10 @@ def get_hotel_data(page, key, trip, location_dict, by_technique=ByTechnique.sele
                                                                                               =accommodation_url,
                                                                                               need_fetch=False)
         else:
-            accommodation_fields = booking_requests.scrape_accommodation_data_without_price(page=page,need_fetch=False)
+            accommodation_fields = booking_requests.scrape_accommodation_data_without_price(page=page,
+                                                                                            accommodation_url=
+                                                                                            accommodation_url,
+                                                                                            need_fetch=False)
         if accommodation_fields is not None:
             location_dict[key] = accommodation_fields
             with open(os.path.dirname(__file__) + '/../Data/Hotels/Locations Data/{location}.json'.format(

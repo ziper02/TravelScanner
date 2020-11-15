@@ -8,7 +8,7 @@ def test_order_hotel():
     flights_data = flight_general.get_all_updated_data()
 
     data_in_range = [flight for flight in flights_data if
-                     (flight.days == 5 or flight.days == 6) and flight.destination_value ==5 and (
+                     (4 <=flight.days<= 6) and flight.destination_value ==10 and (
                              flight.label == 4 or flight.label == 3)
                      and datetime.strptime(flight.return_date, '%Y-%m-%d') < datetime(2021, 5, 1)]
 
@@ -18,7 +18,7 @@ def test_order_hotel():
     i=0
     j=0
     my_set=set()
-    while i<3:
+    while i<2:
         flight = data_in_range[j]
         if flight.destination.city not in my_set:
             trip_list.append(Trip(flight))

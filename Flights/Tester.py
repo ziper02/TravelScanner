@@ -9,6 +9,7 @@ write_back_data = []
 for hotel, json_file in hotels_data:
     if hotel.link != '':
         counter+=1
+
 print(len(hotels_data))
 print(counter)
 
