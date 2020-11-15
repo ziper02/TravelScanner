@@ -36,7 +36,7 @@ class Hotel:
     __link: str
 
     def __init__(self, name_of_hotel: str = '', city_located: str = '', value_for_money: float = -1,
-                 staff_score: float = -1, facilities_score: float = -1,  location_score: float = -1,
+                 staff_score: float = -1, facilities_score: float = -1, location_score: float = -1,
                  free_wifi_score: float = -1, cleanliness_score: float = -1, general_score: float = -1,
                  popular_facilities: list = None, comfort_score: float = -1, url: str = '', address_of_hotel: str = '',
                  price_for_one_room: float = -1, check_in: str = '', check_out: str = '', fetch_date: str = '',
@@ -211,7 +211,7 @@ class Hotel:
     def __str__(self):
         return "name: " + str(self.__name) + " city: " + str(self.__city) + "\nscore: " \
                + str(self.__score) + " location: " + str(self.__location) + " price: " \
-               + str(self.__price)+ "\nlink: " + str(self.__link)
+               + str(self.__price) + "\nlink: " + str(self.__link)
 
     def __repr__(self):
         return "Hotel:: name: " + self.__name + " city: " + self.__city + " score: " + str(self.__score) \

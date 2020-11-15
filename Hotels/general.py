@@ -13,30 +13,6 @@ from Entity.Trip import Trip
 from Flights import general as flight_general
 
 
-def get_data_by_name(trip, fetch_date=datetime.today().strftime('%Y-%m-%d')):
-    """
-    get hotels list for the required flight in trip
-    :param trip:The required flight that need find hotel list
-    :type fetch_date: str
-    :param fetch_date: date of fetch from booking
-    :type trip: Trip
-    :rtype: list(Hotels)
-    :return: list of hotels in asked date and flight
-    """
-    start_date_dt = datetime.strptime(trip.start_date, '%Y-%m-%d')
-    with open(os.path.dirname(__file__) + '/../Data/Hotels/Order Data/{selected_month}'
-                                          '/{location}/{start_date}_{end_date}.json'.format(
-            selected_month=datetime.strftime(start_date_dt, "%Y-%m"),
-            location=trip.destination, start_date=trip.start_date,
-            end_date=trip.end_date), 'r') as f:
-        hotels_data = json.load(f)
-    hotels = []
-    for hotel_key, hotel_val in hotels_data.items():
-        if hotels_data[hotel_key]['fetch date'] == fetch_date:
-            hotels.append(Hotel(**hotels_data[hotel_key]))
-    return hotels
-
-
 def update_data_hotels(destination='all', by_technique=ByTechnique.selenium, multi_thread=None):
     """
     create json with data of hotels in location at Data/Hotel/Location/{destination}.json,
@@ -104,3 +80,49 @@ def get_data_of_location_hotel_in_dates(trip, by_technique=ByTechnique.selenium)
     finally:
         if driver:
             driver.quit()
+
+
+def get_location_data_by_city_name(city_name, with_json_file=False):
+    """
+    give all the hotels with their information that store in data folder
+    :param city_name: the name of city
+    :type city_name: str
+    :param with_json_file: decide if return only flight or
+    append him his json path,by default is just return flight list
+    :type with_json_file: bool
+    :return: list with all hotels and their in information
+    if json_file is true return list of [...,(hotel,json_path),....]
+    else(by default) return list of [....,hotel,....]
+    :rtype: list[Hotel]
+    """
+    path_to_json = os.path.dirname(__file__) + '/../Data/Hotels/Locations Data/' + city_name + '.json'
+    with open(path_to_json, 'r', encoding='utf-8') as f:
+        hotels_data_dict = json.load(f)
+
+    hotels_data = []
+    for key, val in hotels_data_dict.items():
+        if with_json_file:
+            hotels_data.append(Hotel(**val), path_to_json)
+        else:
+            hotels_data.append(Hotel(**val))
+    return hotels_data
+
+
+def get_all_location_data(with_json_file=False):
+    """
+    give all the hotels of all destinations with their information
+    that store in data folder
+    :param with_json_file: decide if return only flight or
+    append him his json path,by default is just return flight list
+    :type with_json_file: bool
+    :return: list with all hotels and their in information
+    if json_file is true return list of [...,(hotel,json_path),....]
+    else(by default) return list of [....,hotel,....]
+    :rtype: list[Hotel]
+    """
+    dest_list = flight_general.get_list_of_all_destinations()
+    city_list = [airport.city for airport in dest_list]
+    hotels_data = []
+    for city in city_list:
+        hotels_data.append(get_location_data_by_city_name(city, with_json_file))
+    return hotels_data

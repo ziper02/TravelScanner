@@ -10,13 +10,12 @@ from Entity.Airport import Airport
 from Entity.Flight import Flight
 from Flights import general
 
-my_blacounter=0
+
 def export_whole_month_all_dest():
     """
     Fetch data from Wizzair.com for all the detentions from TLV,
     parse him to Flight format and save the data as json in Data\\Flights folder.
     """
-    global my_blacounter
     flights_data = fetch_data()
     destinations = moderator.destination_list_wizzair
     departs = moderator.depart_list
@@ -51,7 +50,6 @@ def export_whole_month_all_dest():
                                                       ["price"]["amount"], source_site="Wizzair"))
             flights_filter = [flight for flight in combination_flights if
                               3 <= flight.days < 7]
-            my_blacounter = my_blacounter + len(flights_filter)
             flights_per_year_month_dict = {}
             if len(flights_filter) != 0:
                 flights_data_most_updated.extend(flights_filter)
@@ -67,7 +65,6 @@ def export_whole_month_all_dest():
             for key in flights_per_year_month_dict:
                 general.update_json_files(flights=flights_per_year_month_dict[key],
                                           year_month_date_depart=key, destination=destination_flight)
-    print(my_blacounter)
     general.update_most_updated_flights(flights_data_most_updated)
 
 
@@ -79,7 +76,7 @@ def alter_price(flights):
 def fetch_data():
     """
     Send GET request to Wizzair.com in the required format for all destinations
-    :rtype: list(str)
+    :rtype: list[str]
     :return:data of all destination's flights
     """
     data = DataManager.Wizzair_data_structure

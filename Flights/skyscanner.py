@@ -12,7 +12,6 @@ from tqdm import tqdm
 
 from Flights import general
 
-my_blacounter =0
 def export_whole_month_all_dest():
     """
     Fetch data from SkyScanner.com for all the detentions from TLV,
@@ -39,7 +38,6 @@ def export_whole_month_all_dest():
                     flight_data.extend(flight_to_dest)
                 time.sleep(0.6)
     general.update_most_updated_flights(flight_data)
-    print(my_blacounter)
 
 
 def export_whole_month(depart=None, destination=None, date=None):
@@ -54,7 +52,6 @@ def export_whole_month(depart=None, destination=None, date=None):
     :return list of flights of this month
     :rtype: list[Flight]
     """
-    global my_blacounter
     selected_month = date.strftime('%Y-%m')
     Path(os.path.dirname(__file__) + '/../../Data/Flights/Whole Month/' + selected_month).mkdir(parents=True,
                                                                                                 exist_ok=True)
@@ -83,7 +80,6 @@ def export_whole_month(depart=None, destination=None, date=None):
                 return_date = selected_month + '-' + day_return
                 flight = Flight(flying_out=depart, flying_back=destination, flying_out_date=depart_date,
                                 flying_back_date=return_date, price_per_adult=price, source_site="SkyScanner")
-                my_blacounter=my_blacounter+1
                 flights.append(flight)
             j = j + 1
         i = i + 1

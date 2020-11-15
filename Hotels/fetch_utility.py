@@ -136,7 +136,7 @@ def get_all_hotel_links_per_driver(driver, n=None):
     :param n:the required amount of hotels
     :type n: int
     :return: list of currently available url's of hotels in location
-    :rtype: list(str)
+    :rtype: list[str]
     """
     page_list = list()
     accommodations_urls = list()

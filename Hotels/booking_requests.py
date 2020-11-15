@@ -12,7 +12,7 @@ def scrape_accommodation_data(accommodation_url, trip, location_dict):
     if the trip already in the data get all the info from the dataset and only get the price from site
     else get all the data from the site and also add him to the dataset without price
     :param accommodation_url:list of all the url's that need to scrape
-    :type accommodation_url: list(str)
+    :type accommodation_url: list[str]
     :param trip:the destination with check-in and check-out
     :type trip: Trip.Trip
     :param location_dict:dict with all known data from Location data

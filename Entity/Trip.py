@@ -1,5 +1,4 @@
 from datetime import datetime
-from Hotels import general as general_hotel
 from Entity.Hotel import Hotel
 from Entity.Flight import Flight
 from Hotels import general as hotel_general
@@ -40,20 +39,25 @@ class Trip:
             self.__alternative_hotels = []
             self.__price = price
 
-    def __update_hotels(self, fetch_date: str = datetime.today().strftime('%Y-%m-%d')):
+    def get_hotel_for_trip(self, fetch_date=datetime.today().strftime('%Y-%m-%d')):
         """
-        update the hotel that selected for trip in Hotel and also offer other alternative hotels
-        for this trip in alternative_hotels 
-        :param fetch_date:the date that the data fetched
-        :type fetch_date: Datetime
+        get hotels list for the required flight in trip
+        :param fetch_date: date of fetch from booking
+        :type fetch_date: str
+        :return: list of hotels in asked date and flight
+        :rtype: list[Hotel]
         """
-        hotel_general.get_data_of_location_hotel_in_dates(self, by_technique=fetch_utility.ByTechnique.requests)
-        hotels_data = general_hotel.get_data_by_name(self, fetch_date)
-        hotels_data = [hotel for hotel in hotels_data if not isinstance(hotel.price, str)]
-        hotels_data = [hotel for hotel in hotels_data if hotel.price != 'no available' and hotel.price > 0]
-        hotels_data.sort(key=lambda x: int(x.price), reverse=False)
-        self.__hotel = hotels_data.pop(0)
-        self.__alternative_hotels = hotels_data
+        start_date_dt = datetime.strptime(self.__start_date, '%Y-%m-%d')
+        with open(os.path.dirname(__file__) + '/../Data/Hotels/Order Data/{selected_month}'
+                                              '/{location}/{start_date}_{end_date}.json'.format(
+                selected_month=datetime.strftime(start_date_dt, "%Y-%m"), location=self.__destination,
+                start_date=self.__start_date, end_date=self.__end_date), 'r') as f:
+            hotels_data = json.load(f)
+        hotels = []
+        for hotel_key, hotel_val in hotels_data.items():
+            if hotels_data[hotel_key]['fetch date'] == fetch_date:
+                hotels.append(Hotel(**hotels_data[hotel_key]))
+        return hotels
 
     @property
     def hotel(self) -> Hotel:
@@ -97,3 +101,20 @@ class Trip:
     def __gt__(self, other):
         if isinstance(other, Trip):
             return self.__price > other.__price
+
+    # -----------------------------------------------------------------------------------------------------------------
+
+    def __update_hotels(self, fetch_date: str = datetime.today().strftime('%Y-%m-%d')):
+        """
+        update the hotel that selected for trip in Hotel and also offer other alternative hotels
+        for this trip in alternative_hotels
+        :param fetch_date:the date that the data fetched
+        :type fetch_date: Datetime
+        """
+        hotel_general.get_data_of_location_hotel_in_dates(self, by_technique=fetch_utility.ByTechnique.requests)
+        hotels_data = self.get_data_for_trip(self, fetch_date)
+        hotels_data = [hotel for hotel in hotels_data if not isinstance(hotel.price, str)]
+        hotels_data = [hotel for hotel in hotels_data if hotel.price != 'no available' and hotel.price > 0]
+        hotels_data.sort(key=lambda x: int(x.price), reverse=False)
+        self.__hotel = hotels_data.pop(0)
+        self.__alternative_hotels = hotels_data

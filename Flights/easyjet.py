@@ -10,7 +10,6 @@ from Entity.Airport import Airport
 from Entity.Flight import Flight
 from Flights import general
 
-my_blacounter=0
 def export_whole_months_all_dest():
     """
     Fetch data from Easyjet.com for all the detentions from TLV,
@@ -28,7 +27,6 @@ def export_whole_months_all_dest():
             if len(flights_to_dest) != 0:
                 flights_data.extend(flights_to_dest)
             time.sleep(0.6)
-    print(my_blacounter)
     general.update_most_updated_flights(flights_data)
 
 
@@ -42,7 +40,6 @@ def export_whole_months(depart=None, destination=None):
     :return return list of flights from departure airport to destination airport
     :rtype list[Flight]
     """
-    global my_blacounter
     whole_month_url = DataManager.Easyjet_whole_month_request
     date_str = datetime.today().strftime('%Y-%m-%d')
     request_whole_month_url = whole_month_url.format(depart=depart.code, destination=destination.code,
@@ -102,7 +99,6 @@ def export_whole_months(depart=None, destination=None):
                                             flying_back_date=selected_date_return_str, price_per_adult=total_price,
                                             source_site='Easyjet')
                             flights.append(flight)
-                            my_blacounter = my_blacounter +1
             day_index = day_index + 1
         if len(flights) != 0:
             general.update_json_files(flights=flights, year_month_date_depart=year_month_date_depart,

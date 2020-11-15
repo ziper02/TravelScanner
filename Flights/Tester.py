@@ -1,6 +1,5 @@
 import time
 from datetime import datetime
-
 from Trip import Trip
 from Flights import general as flight_general
 
@@ -13,11 +12,10 @@ def test_order_hotel():
                              flight.label == 4 or flight.label == 3)
                      and datetime.strptime(flight.return_date, '%Y-%m-%d') < datetime(2021, 1, 1)]
 
-    count = 0
     data_in_range.sort()
     trip_list = []
     time_start=time.time()
-    for i in range(0, 25):
+    for i in range(26, 27):
         flight = data_in_range[i]
         trip_list.append(Trip(flight))
 

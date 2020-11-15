@@ -30,7 +30,7 @@ def update_json_files(flights, year_month_date_depart, destination):
     """
     Update the data folder with the fetched flights
     :param flights: flights that need to update in json files
-    :type flights: list(flights)
+    :type flights: list[Flight]
     :param year_month_date_depart:month and year in format:YYYY-MM for folder name
     :type year_month_date_depart:Datetime
     :param destination:The destination of the flight
@@ -117,6 +117,7 @@ def get_data_by_name(name, add_json_file=False):
     :return: list of all flights of destination
     if add_json_file is true return list of [...,(flight,json_path),....]
     else(by default) return list of [....,flight,....]
+    :rtype: list[Flight]
     """
     files_lst = get_files_list_of_location(name)
     flights_data = []
@@ -137,7 +138,7 @@ def get_files_list_of_location(name):
     :param name: the full name of location 
     :type name: str
     :return: list of all files of the location that required
-    :rtype: list(str) 
+    :rtype: list[str]
     """
     with open(os.path.dirname(__file__) +
               '/../Data/Flights/json_files_dict.json', 'r') as f:
@@ -158,7 +159,7 @@ def get_all_updated_data(multi_thread=None):
     :param multi_thread: how much threads use for get the data from files
     :type multi_thread: int
     :return: list of updated flights of destination
-    :rtype: list(flight)
+    :rtype: list[Flight]
     """
     multi_thread_decide = False
     sem = None
@@ -200,7 +201,7 @@ def get_updated_data_by_name(name, sem=None, return_que=None):
     :param return_que: queue for return result for multithreading
     :type return_que: queue
     :return: list of updated flights of destination
-    :rtype: list(flight)
+    :rtype: list[Flight]
     """
     try:
         files_lst = get_files_list_of_location(name)
@@ -225,7 +226,7 @@ def get_flights_data_from_json_file(json_file):
     :param json_file:the path of json file that contains flights
     :type json_file: str
     :return:flights data from this json
-    :rtype list(Flight)
+    :rtype list[Flight]
     """
     flights_data = []
     with open(os.path.dirname(__file__) + "/../" + json_file) as f:
@@ -239,7 +240,7 @@ def update_json_dest_by_list(flight_data):
     """
     get list of [....,(flight,json_path),...] and update the flight in the json path
     :param flight_data: list of tuples with all destination's flight (flight,json_file)
-    :type flight_data: list(list(flights,str))
+    :type flight_data: list[list[Flight,str]]
     """
     json_dict = {}
     for flight, json_file in flight_data:
@@ -294,7 +295,7 @@ def get_list_of_all_destinations():
     """
     get list of all destinations in data folder
     :return:list of all airports in data
-    :rtype:list(Airport)
+    :rtype:list[Airport]
     """
     airports_code = set()
     airports_code.update(moderator.destination_list_wizzair)
@@ -332,7 +333,7 @@ def get_updated_data_from_json_file():
     get all the flights of all destinations in that that fetched today-the most updated flights
     the data load from most_updated_flights , its alternative for get_all_updated_data
     :return: list of updated flights of destination
-    :rtype: list(flight)
+    :rtype: list[Flight]
     """
     with open(os.path.dirname(__file__) + "\..\Data\Flights\most_updated_flights.json", 'r', encoding='utf-8') as f:
         flights_data_json = json.load(f)

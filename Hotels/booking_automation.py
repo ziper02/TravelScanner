@@ -13,7 +13,7 @@ def scrape_accommodation_data(driver, accommodation_url, trip, location_dict):
     else get all the data from the site and also add him to the dataset without price
     :type driver: selenium.webdriver.chrome.webdriver.WebDriver
     :param accommodation_url:list of all the url's that need to scrape
-    :type accommodation_url: list(str)
+    :type accommodation_url: list[str]
     :param trip:the destination with check-in and check-out
     :type trip: Entity.Trip.Trip
     :param location_dict:dict with all known data from Location data
