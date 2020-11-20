@@ -1,4 +1,5 @@
 import copy
+from datetime import datetime
 
 
 class Hotel:
@@ -34,6 +35,7 @@ class Hotel:
     __cleanliness: float
     __comfort: float
     __link: str
+    __days: int
 
     def __init__(self, name_of_hotel: str = '', city_located: str = '', value_for_money: float = -1,
                  staff_score: float = -1, facilities_score: float = -1, location_score: float = -1,
@@ -110,6 +112,11 @@ class Hotel:
                 self.__check_out = ''
                 self.__price = -1
                 self.__fetch_date = ''
+        if self.__check_in != '' and self.__check_out != '':
+            self.__days = (datetime.strptime(self.__check_out, '%Y-%m-%d') - datetime.strptime(
+                self.__check_in, '%Y-%m-%d')).days
+        else:
+            self.__days = -1
 
     def to_json(self):
         """
@@ -139,6 +146,15 @@ class Hotel:
             dict_to_json["price"] = self.__price
             dict_to_json["fetch date"] = self.__fetch_date
         return dict_to_json
+
+    @property
+    def days(self) -> int:
+        if self.__days != -1:
+            return self.__days
+        elif self.__check_in != '' and self.__check_out != '':
+            self.__days = (datetime.strptime(self.__check_out, '%Y-%m-%d') - datetime.strptime(self.__check_in,
+                                                                                               '%Y-%m-%d')).days
+        return self.__days
 
     @property
     def name(self) -> str:
@@ -232,3 +248,39 @@ class Hotel:
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __lt__(self, other):
+        if isinstance(other, Hotel):
+            if self.__price != -1:
+                return self.__price / self.__days < other.__price / other.__days
+            else:
+                self_score = self.__score + self.__location + self.__staff + self.__facilities \
+                             + self.__value_for_money + self.__free_wifi + self.__cleanliness + self.__comfort
+                other_score = other.__score + other.__location + other.__staff + other.__facilities + \
+                              other.__value_for_money + other.__free_wifi + other.__cleanliness + other.__comfort
+                if self_score == other_score:
+                    if self.__name > other.__name:
+                        self_score += 1
+                    else:
+                        other_score += 1
+                return self_score > other_score
+
+    def __gt__(self, other):
+        if isinstance(other, Hotel):
+            if self.__price != -1:
+                return self.__price / self.__days > other.__price / other.__days
+            else:
+                self_score = self.__score + self.__location + self.__staff + self.__facilities \
+                             + self.__value_for_money + self.__free_wifi + self.__cleanliness + self.__comfort
+                other_score = other.__score + other.__location + other.__staff + other.__facilities \
+                              + other.__value_for_money + other.__free_wifi + other.__cleanliness + other.__comfort
+
+                if self_score == other_score:
+                    if self.__name > other.__name:
+                        self_score += 1
+                    else:
+                        other_score += 1
+                return self_score < other_score
+
+    def __hash__(self) -> int:
+        return super().__hash__()
