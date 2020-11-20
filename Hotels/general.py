@@ -24,25 +24,30 @@ def update_data_hotels(destination='all', by_technique=ByTechnique.selenium, mul
     :param multi_thread: how much threads use for fetch data or none for single thread
     :type multi_thread: int
     """
+    if not isinstance(destination, str) or not isinstance(by_technique, bool) or not isinstance(multi_thread, int):
+        raise ValueError("Wrong parameters type")
     sem = None
     if multi_thread is not None and multi_thread > 1:
         sem = Semaphore(int(multi_thread))
     if destination == 'all':
         airports_list = flight_general.get_list_of_all_destinations()
+        if len(airports_list) == 0:
+            return
         destinations = {airport.city for airport in airports_list}
-        thread = None
+        threads = list()
         for location in destinations:
             if multi_thread is not None and multi_thread > 1:
                 sem.acquire()
                 thread = Thread(target=fetch_utility.update_data_per_location_hotels_without_dates,
                                 args=(location, sem, by_technique))
                 thread.start()
+                threads.append(thread)
             else:
                 fetch_utility.update_data_per_location_hotels_without_dates(location_name=location,
                                                                             by_technique=by_technique)
         if multi_thread is not None:
-            sem.acquire()
-        thread.join()
+            for thread in threads:
+                thread.join()
     else:
         fetch_utility.update_data_per_location_hotels_without_dates(destination, by_technique=by_technique)
 
