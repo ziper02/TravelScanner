@@ -48,9 +48,13 @@ def backup():
     for backup_item in backup_list:
         backup_list.set_description(backup_item)
         if os.path.isdir(path_form + backup_item):
-            copy_tree(path_form + backup_item, backup_folder + "\\" + backup_item)
+            os.makedirs(os.path.dirname(backup_folder + backup_item), exist_ok=True)
+            copy_tree(path_form + backup_item, backup_folder + backup_item)
         elif os.path.isfile(path_form + backup_item):
-            shutil.copyfile(path_form + backup_item, backup_folder + "\\" + backup_item)
+            os.makedirs(os.path.dirname(backup_folder + backup_item), exist_ok=True)
+            shutil.copyfile(path_form + backup_item, backup_folder + backup_item)
+        else:
+            print(f'Error with {backup_item}')
 
 
 def restore(today_str=datetime.today().strftime('%d%m%Y')):

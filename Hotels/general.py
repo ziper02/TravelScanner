@@ -96,14 +96,14 @@ def get_location_data_by_city_name(city_name, with_json_file=False):
     :rtype: list[Hotel]
     """
 
-    if not isinstance(city_name,str) or not isinstance(with_json_file,bool):
+    if not isinstance(city_name, str) or not isinstance(with_json_file, bool):
         raise ValueError("Wrong types of parameters")
     path_to_json = os.path.dirname(__file__) + '//..//Data//Hotels//Locations Data//' + city_name + '.json'
     try:
         with open(path_to_json, 'r', encoding='utf-8') as f:
             hotels_data_dict = json.load(f)
     except FileNotFoundError:
-        print(city_name+" not found("+path_to_json+")")
+        print(city_name + " not found(" + path_to_json + ")")
         return []
     hotels_data = []
     for key, val in hotels_data_dict.items():
@@ -126,11 +126,15 @@ def get_all_location_data(with_json_file=False):
     else(by default) return list of [....,hotel,....]
     :rtype: list[Hotel]
     """
+    if not isinstance(with_json_file, bool):
+        raise ValueError("with_json_file suppose to be boolean type")
+
     dest_list = flight_general.get_list_of_all_destinations()
+    if len(dest_list) == 0:
+        return list()
     city_list = list(set([airport.city for airport in dest_list]))
+
     hotels_data = []
     for city in city_list:
         hotels_data.extend(get_location_data_by_city_name(city, with_json_file))
     return hotels_data
-
-
