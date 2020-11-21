@@ -24,14 +24,15 @@ def update_data_hotels(destination='all', by_technique=ByTechnique.selenium, mul
     :param multi_thread: how much threads use for fetch data or none for single thread
     :type multi_thread: int
     """
-    if not isinstance(destination, str) or not isinstance(by_technique, bool) or not isinstance(multi_thread, int):
+    if not isinstance(destination, str) or not isinstance(by_technique, ByTechnique) or \
+            not isinstance(multi_thread, int):
         raise ValueError("Wrong parameters type")
     sem = None
     if multi_thread is not None and multi_thread > 1:
         sem = Semaphore(int(multi_thread))
     if destination == 'all':
         airports_list = flight_general.get_list_of_all_destinations()
-        if len(airports_list) == 0:
+        if not airports_list:
             return
         destinations = {airport.city for airport in airports_list}
         threads = list()
@@ -135,7 +136,7 @@ def get_all_location_data(with_json_file=False):
         raise ValueError("with_json_file suppose to be boolean type")
 
     dest_list = flight_general.get_list_of_all_destinations()
-    if len(dest_list) == 0:
+    if not dest_list:
         return list()
     city_list = list(set([airport.city for airport in dest_list]))
 
