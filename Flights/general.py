@@ -203,7 +203,7 @@ def get_updated_data_by_name(name, sem=None, return_que=None):
     """
     try:
         files_lst = get_files_list_of_location(name)
-        today_date = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+        today_date = (datetime.today()).strftime('%Y-%m-%d')
         updated_data_lst = [item for item in files_lst if today_date in item]
         flights_data = []
         # get the data from files

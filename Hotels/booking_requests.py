@@ -22,6 +22,7 @@ def scrape_accommodation_data(accommodation_url, trip, location_dict):
     """
     request_url = accommodation_url.replace('.html', '.en-gb.html') + DataManager.booking_order_address.format(
         start_date=trip.start_date, end_date=trip.end_date)
+    request_url=accommodation_url
     request = requests.get(url=request_url, headers=DataManager.booking_headers)
     page = request.text
     html_page = page.split('\n')

@@ -119,7 +119,7 @@ def fetch_data_for_trip(driver, n_results, trip, by_technique=ByTechnique.seleni
     with open(os.path.dirname(__file__) + '/../Data/Hotels/Locations Data/{location}.json'.format(
             location=trip.destination), 'r') as JSON:
         location_dict = json.load(JSON)
-    my_range = list(range(0, len(accommodations_urls)))
+    my_range = list(range(0,min(len(accommodations_urls),n_results)))
     for url in my_range:
         if by_technique == ByTechnique.selenium:
             url_data, can_order = booking_automation.scrape_accommodation_data(driver, accommodations_urls[url], trip,
@@ -233,7 +233,7 @@ def prepare_driver_chrome(url):
     :rtype:selenium.webdriver.chrome.webdriver.WebDriver
     """
     options = Options()
-    options.add_argument('-headless')
+    #options.add_argument('-headless')
     options.add_argument("--lang=en-gb")
     options.add_argument('window-size=1920x1080')
     caps = DesiredCapabilities().CHROME
@@ -276,7 +276,7 @@ def fill_form_with_dates(driver, trip):
     driver.find_element_by_class_name('sb-searchbox__button').click()  # We look for the search button and click it
     WebDriverWait(driver, timeout=10).until(EC.presence_of_all_elements_located(
         (By.CLASS_NAME, 'sr-hotel__title')))  # wait until the elements with the class name
-    # sr-trip-title (the one containing the accommodations titles) appear.
+    # # sr-trip-title (the one containing the accommodations titles) appear.
 
 
 def fill_form_without_dates(driver, location_name):

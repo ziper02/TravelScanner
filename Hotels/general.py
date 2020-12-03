@@ -63,7 +63,7 @@ def get_data_of_location_hotel_in_dates(trip, by_technique=ByTechnique.selenium)
     :param trip: Trip object with Destination,Check-in and Check-out
     :type trip: Trip
     """
-    req_result = 200
+    req_result = 50
     driver = None
     try:
         start_date_dt = datetime.strptime(trip.start_date, '%Y-%m-%d')
@@ -72,7 +72,12 @@ def get_data_of_location_hotel_in_dates(trip, by_technique=ByTechnique.selenium)
             selected_month=datetime.strftime(start_date_dt, "%Y-%m"), location=trip.destination,
             start_date=trip.start_date, end_date=trip.end_date))
         if already_fetched_check.is_file():
-            return
+            fetch_date_temp = datetime.today().strftime('%Y-%m-%d')
+            with open(already_fetched_check,'r',encoding='utf-8') as f:
+                temp=json.load(f)
+            for key in temp:
+                if temp[key]['fetch date']==fetch_date_temp:
+                    return
     except Exception:
         pass
     try:

@@ -37,6 +37,38 @@ def test_order_hotel():
     print((time_end - time_start) / 60)
 
 
-if __name__ == "__main__":
-    test_order_hotel()
 
+
+
+from Flights import general as flight_general
+
+def fetch_flights_for_site():
+    flight_general.fetch_data()
+    with open(os.path.dirname(__file__)+"\\Data\\Flights\\most_updated_flights.json",'r',encoding='utf-8') as f:
+        flight_list=json.load(f)
+    for flight in flight_list:
+        keys_temp=[str(key) for key in flight]
+        for key in keys_temp:
+            flight[key.replace(" ","_")]=flight.pop(key)
+
+    with open(os.path.dirname(__file__)+"\\..\\To Site\\flights.json",'w',encoding='utf-8') as f:
+        json.dump(flight_list,f,indent=4)
+
+
+
+
+
+def to_nisim():
+
+    with open(os.path.dirname(__file__)+"\\Data\\Hotels\\Order Data\\2020-12\\Milano\\2020-12-13_2020-12-18.json",'r',encoding='utf-8') as f:
+        data_dict=json.load(f)
+
+    data=[val for key,val in data_dict.items()]
+
+    with open(os.path.dirname(__file__)+"\\toNisimWithPrice.json",'w',encoding='utf-8') as f:
+        json.dump(data,f,indent=4)
+
+
+if __name__ == "__main__":
+    #test_order_hotel()
+    fetch_flights_for_site()

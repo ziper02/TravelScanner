@@ -76,6 +76,25 @@ class Trip:
                 hotels.append(Hotel(**hotels_data[hotel_key]))
         return hotels
 
+
+    def to_json(self):
+        """
+        :return dictionary with all attributes
+        :rtype: dict
+        """
+        trip_dict=dict()
+        flight_dict= self.__flight.to_json()
+        hotel_dict=self.__hotel.to_json()
+        for key in flight_dict:
+            if key!= "depart date" or key!= "return date" or key!= "return date" or key!= "label" or key!= "data set" :
+                if key=="price":
+                    trip_dict["flight "+key] = flight_dict[key]
+        for key in hotel_dict:
+            if key!="fetch date":
+                trip_dict["hotel " + key] = hotel_dict[key]
+        trip_dict["total price"]=self.__price
+        return trip_dict
+
     @property
     def hotel(self) -> Hotel:
         return self.__hotel
